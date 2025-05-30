@@ -63,6 +63,7 @@ docs = [
   "sphinx>=7.0",
   "sphinx_autodoc_typehints",
   "sphinx_copybutton",
+  "sphinx-design",
 ]
 lint = [
   "pre-commit>=4.5.0",
