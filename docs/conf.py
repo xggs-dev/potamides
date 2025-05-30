@@ -16,6 +16,7 @@ version = release = importlib.metadata.version("potamides")
 extensions = [
     "matplotlib.sphinxext.plot_directive",
     "myst_parser",
+    "sphinx_design",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
