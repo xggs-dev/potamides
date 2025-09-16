@@ -64,7 +64,7 @@ pip install -e .  # editable mode
 
 ## Quickstart
 
-### Fitting the Stream
+### Fitting a Stream
 
 ```{code-block} python
 
