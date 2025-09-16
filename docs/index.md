@@ -120,7 +120,7 @@ pip install -e .  # editable mode
     "rot_z": 0.0,
     "rot_x": 0.0,
 }
->>>params_statics = {"withdisk": False}
+>>> params_statics = {"withdisk": False}
 
 >>> @jax.jit
 >>> def compute_acc_hat(params, pos2d):
