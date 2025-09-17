@@ -7,7 +7,7 @@
 ```
 
 ```{toctree}
-:mxdepth:1
+:mxdepth:2
 :hidden:
 :caption: Guides
 
@@ -80,22 +80,22 @@ pip install -e .  # editable mode
 ```{code-block} python
 
 >>> import potamides
->>> from potamides import splinelib
+>>> from potamides import splinelib as splib
 
 >>> num_knots=6
->>> fid_gamma, fid_knots = splinelib.make_increasing_gamma_from_data(xy_centered)
+>>> fid_gamma, fid_knots = splib.make_increasing_gamma_from_data(xy_centered)
 >>> fiducial_spline = interpax.Interpolator1D(fid_gamma, fid_knots, method="cubic2")
 >>> ref_gamma = jnp.linspace(fid_gamma.min(), fid_gamma.max(), num=128)
 >>> ref_points = fiducial_spline(ref_gamma)
->>> knots = splinelib.optimize_spline_knots(
-    splinelib.default_cost_fn,
+>>> knots = splib.optimize_spline_knots(
+    splib.default_cost_fn,
     fid_knots,
     fid_gamma,
     cost_args=(ref_gamma, ref_points),
     cost_kwargs=ImmutableMap({"concavity_weight": 1e12}),
 )
 >>> spline = interpax.Interpolator1D(fid_gamma, knots, method="cubic2")
->>> opt_gamma, opt_knots = splinelib.new_gamma_knots_from_spline(
+>>> opt_gamma, opt_knots = splib.new_gamma_knots_from_spline(
     spline, nknots=num_knots
 )
 >>> track=ptd.Track(opt_gamma, opt_knots)
@@ -165,8 +165,7 @@ pip install -e .  # editable mode
 
 
 >>> compute_ln_likelihood = jax.vmap(
-    compute_ln_likelihood_scalar, in_axes=(0, None, None, None)
-)
+... compute_ln_likelihood_scalar, in_axes=(0, None, None, None))
 
 ```
 

@@ -15,9 +15,9 @@ Here, `num_knots` is a key parameter controlling the spline fit, inndicating how
 many knots the spline is composed of.
 
 ```{code block}python
->>> from potamides import splinelib
+>>> from potamides import splinelib as splib
 >>> import interpax
->>> fid_gamma, fid_knots = splinelib.make_increasing_gamma_from_data(xy_centered)
+>>> fid_gamma, fid_knots = splib.make_increasing_gamma_from_data(xy_centered)
 >>> fiducial_spline = interpax.Interpolator1D(fid_gamma, fid_knots, method="cubic2")
 >>> ref_gamma = jnp.linspace(fid_gamma.min(), fid_gamma.max(), num=128)
 >>> ref_points = fiducial_spline(ref_gamma)
@@ -42,8 +42,8 @@ length
 
 ```{code block}python
 >>> from xmmutablemap import IMMutableMap
->>> knots = splinelib.optimize_spline_knots(
->>>     splinelib.default_cost_fn,
+>>> knots = splib.optimize_spline_knots(
+>>>     splib.default_cost_fn,
 >>>     fid_knots,
 >>>     fid_gamma,
 >>>     cost_args=(ref_gamma, ref_points),
@@ -55,7 +55,7 @@ length
 
 >>> # Create a new gamma, proportional to the arc-length from the spline.
 >>> # arclength.
->>> opt_gamma, opt_knots = splinelib.new_gamma_knots_from_spline(
+>>> opt_gamma, opt_knots = splib.new_gamma_knots_from_spline(
 >>>     spline, nknots=num_knots
 >>> )
 
