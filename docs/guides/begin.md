@@ -9,6 +9,7 @@ The basic work flow is stream fitting, then
 The stream is 3D. We use only 2D (x-z), for plotting we name it as (x-y)
 
 ```{code-block} python
+# doctet: +SKIP
 
 >>> import numpy as np
 >>> import matplotlib.pyplot as plt
