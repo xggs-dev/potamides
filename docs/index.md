@@ -201,9 +201,9 @@ found in the `potamides.splinelib` module.
 
 ```
 
-### visulaize the likelihood
+Now we can visualize the inference result in 2D:
 
-```{code-block} python
+```{plot}
 
 >>> hist2d_kw = {
     "bins": 20,
