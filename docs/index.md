@@ -7,6 +7,14 @@
 ```
 
 ```{toctree}
+:mxdepth:1
+:hidden:
+:caption: Guides
+
+guides/begin.md
+```
+
+```{toctree}
 :maxdepth: 2
 :hidden:
 :caption: 🔌 API Reference
