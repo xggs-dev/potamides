@@ -1,6 +1,6 @@
 # 2D inference
 
-```{code block}python
+```{code block} python
 >>> import corner
 >>> ranges = {
 >>>     "q1": (0.1, 1),

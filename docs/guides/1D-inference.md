@@ -1,6 +1,6 @@
 # 1D-inference
 
-```{code block}python
+```{code block} python
 >>> import potamides as ptd
 >>> import unxt as u
 >>> import jax.random as jr
