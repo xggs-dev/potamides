@@ -180,10 +180,7 @@ found in the `potamides.splinelib` module.
 
 ```{code-block} python
 
->>> ranges = {
-    "q1": (0.1, 2),
-    "phi": (-np.pi/2, np.pi / 2),
-}
+>>> ranges = {"q1": (0.1, 2), "phi": (-np.pi/2, np.pi / 2)}
 
 >>> key = jr.key(0)
 >>> skeys = jr.split(key, num=len(ranges))
