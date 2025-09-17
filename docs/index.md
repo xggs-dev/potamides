@@ -92,33 +92,29 @@ We will also assume the following imports for computing and visualization:
 >>> import functools as ft
 >>> import jax
 >>> import jax.numpy as jnp
+>>> import jax.random as jr
 >>> import matplotlib.pyplot as plt
+>>> import unxt as u
 ```
 
-### Fitting a Stream
+### Fitting a 'Stream'
+
+Let's create a mock stream in 2D (a circle) and fit it with a spline. In
+practice, you would replace this with your actual stream data.
 
 ```{code-block} python
->>> num_knots=6
->>> fid_gamma, fid_knots = splib.make_increasing_gamma_from_data(xy_centered)
->>> fid_spline = interpax.Interpolator1D(fid_gamma, fid_knots, method="cubic2")
->>> ref_gamma = jnp.linspace(fid_gamma.min(), fid_gamma.max(), num=128)
->>> ref_points = fid_spline(ref_gamma)
->>> knots = splib.optimize_spline_knots(
-    splib.default_cost_fn,
-    fid_knots,
-    fid_gamma,
-    cost_args=(ref_gamma, ref_points),
-    cost_kwargs=ImmutableMap({"concavity_weight": 1e12}),
-)
->>> spline = interpax.Interpolator1D(fid_gamma, knots, method="cubic2")
->>> opt_gamma, opt_knots = splib.new_gamma_knots_from_spline(
-    spline, nknots=num_knots
-)
->>> track=ptd.Track(opt_gamma, opt_knots)
-
+>>> gamma = jnp.linspace(0, 2 * jnp.pi, 10_000)
+>>> data = 2 * jnp.stack([jnp.cos(gamma), jnp.sin(gamma)], axis=-1)
 ```
 
-Now we can visualize the stream:
+Then we make the stream track. We choose 25 knots for the spline fit. For
+demonstration purposes we'll set the knot position directly from the data.
+
+```{code-block} python
+>>> track=ptd.Track(gamma[::400], data[::400])
+```
+
+Now we can visualize the 'stream':
 
 ```{plot}
 :include-source: true
@@ -135,51 +131,38 @@ plt.show()
 ```{code-block} python
 
 >>> params_defaults = {
-    "rs_halo": 16,  # [kpc]
-    "vc_halo": u.Quantity(250, "km/s").ustrip("kpc/Myr"),
-    "q1": 1.0,
-    "q2": 1.0,
-    "q3": 1.0,
-    "phi": 0.0,
-    "Mdisk": 1.2e10,  # [Msun]
-    "origin_x": 0,
-    "origin_y": 0,
-    "origin_z": 0,
-    "rot_z": 0.0,
-    "rot_x": 0.0,
-}
+...    "rs_halo": 16,  # [kpc]
+...    "vc_halo": u.Quantity(250, "km/s").ustrip("kpc/Myr"),
+...    "q1": 1.0,
+...    "q2": 1.0,
+...    "q3": 1.0,
+...    "phi": 0.0,
+...    "Mdisk": 1.2e10,  # [Msun]
+...    "origin_x": 0,
+...    "origin_y": 0,
+...    "origin_z": 0,
+...    "rot_z": 0.0,
+...    "rot_x": 0.0,
+... }
 >>> params_statics = {"withdisk": False}
 
 >>> @jax.jit
->>> def compute_acc_hat(params, pos2d):
-    # Positions: 2D -> 3D
-    pos3d = jnp.zeros((len(pos2d), 3))
-    pos3d = pos3d.at[:, :2].set(pos2d)
-
-    # Accelerations from the potential model
-    params = params_defaults | params_statics | params
-    params["origin"] = jnp.array(
-        [
-            params.pop("origin_x", 0),
-            params.pop("origin_y", 0),
-            params.pop("origin_z", 0),
-        ]
-    )
-    return ptd.compute_accelerations(pos3d, **params)
+... def compute_acc_hat(p, /, pos2d):
+...    # Positions: 2D -> 3D
+...    pos3d = jnp.zeros((len(pos2d), 3))
+...    pos3d = pos3d.at[:, :2].set(pos2d)
+...    # Accelerations from the potential model
+...    p = params_defaults | params_statics | p
+...    p["origin"] = jnp.array([p.pop("origin_x", 0), p.pop("origin_y", 0), p.pop("origin_z", 0)])
+...    return ptd.compute_accelerations(pos3d, **p)
 
 
 >>> @ft.partial(jax.vmap, in_axes=(0, None, None, None))
->>> @jax.jit
->>> def compute_ln_likelihood(params, pos2d, unit_curvature, where_straight=None):
-    unit_acc_xy = compute_acc_hat(params, pos2d)
-    where_straight = (
-        where_straight
-        if where_straight is not None
-        else jnp.zeros(len(unit_curvature), dtype=bool)
-    )
-    return ptd.compute_ln_likelihood(
-        unit_curvature, unit_acc_xy, where_straight=where_straight
-    ) / len(unit_curvature)
+... @jax.jit
+... def compute_ln_likelihood(p, /, pos2d, unit_kappa, where_straight=None):
+...    unit_acc_xy = compute_acc_hat(p, pos2d)
+...    straight = jnp.zeros(len(unit_kappa), dtype=bool) if where_straight is None else where_straight
+...    return ptd.compute_ln_likelihood(unit_kappa, unit_acc_xy, where_straight=straight) / len(unit_kappa)
 
 ```
 
@@ -187,20 +170,16 @@ plt.show()
 
 ```{code-block} python
 
->>> ranges = {"q1": (0.1, 2), "phi": (-np.pi/2, np.pi / 2)}
+>>> ranges = {"q1": (0.1, 2), "phi": (-jnp.pi/2, jnp.pi / 2)}
 
->>> key, skeys = jr.split(jr.key(0), num=len(ranges) + 1)
+>>> key, *skeys = jr.split(jr.key(0), num=len(ranges) + 1)
 >>> nsamples = 1_000_000
->>> params = {
-    k: jr.uniform(skey, minval=v[0], maxval=v[1], shape=nsamples)
-    for skey, (k, v) in zip(skeys, ranges.items(), strict=True)
-}
+>>> params = {k: jr.uniform(skey, minval=v[0], maxval=v[1], shape=nsamples)
+...           for skey, (k, v) in zip(skeys, ranges.items(), strict=True)}
 
 >>> gamma = jnp.linspace(-0.95, 0.95, 128)
 
->>> lnlik_seg = compute_ln_likelihood(
-    params, track(gamma), track.curvature(gamma), None
-)
+>>> lnlik_seg = compute_ln_likelihood(params, track(gamma), track.curvature(gamma), None)
 
 ```
 
