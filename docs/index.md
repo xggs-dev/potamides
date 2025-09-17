@@ -238,11 +238,6 @@ found in the `potamides.splinelib` module.
 - [Equinox][equinox]: one-stop JAX library, for everything that isn't already in
   core JAX.
 
-### `potamides`'s Dependents
-
-- [coordinax][coordinax]: Coordinates in JAX.
-- [galax][galax]: Galactic dynamics in JAX.
-
  <!-- LINKS -->
 
 [coordinax]: https://github.com/GalacticDynamics/coordinax
