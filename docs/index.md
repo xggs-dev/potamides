@@ -118,15 +118,16 @@ We will also assume the following imports for computing and visualization:
 
 ```
 
-### visulaize the Stream
+Now we can visualize the stream:
 
-```{code-block} python
+```{plot}
+:include-source: true
+:context: close-figs
 
->>> fig, ax = plt.subplots(figsize=(figsize, figsize),dpi=150)
->>> plot_sparse_gamma = jnp.linspace(track.gamma.min(), track.gamma.max(), num=8)
->>> track.plot_all(plot_sparse_gamma, ax=ax, show_tangents=False)
->>> plt.show()
-
+fig, ax = plt.subplots(figsize=(figsize, figsize), dpi=150)
+_gamma = jnp.linspace(track.gamma.min(), track.gamma.max(), num=8)  # for plotting only
+track.plot_all(_gamma, ax=ax, show_tangents=False)
+plt.show()
 ```
 
 ### Initial basic function for calculating the likelihood
@@ -206,8 +207,10 @@ We will also assume the following imports for computing and visualization:
 Now we can visualize the inference result in 2D:
 
 ```{plot}
+:include-source: true
+:context: close-figs
 
->>> hist2d_kw = {
+hist2d_kw = {
     "bins": 20,
     "color": "purple",
     "levels": [0.68, 0.95, 0.997],
@@ -216,16 +219,16 @@ Now we can visualize the inference result in 2D:
     "plot_datapoints": False,
 }
 
-
->>> fig, ax = plt.subplots(figsize=(4, 4))
->>> corner.hist2d(
+fig, ax = plt.subplots(figsize=(4, 4))
+corner.hist2d(
     params["q1"],
     params["phi"] * 180 / jnp.pi,  # convert to degrees
     weights=np.exp(lnlik_seg - lnlik_seg.max()),
     **hist2d_kw,
 )
->>> ax.set_xlabel('q')
->>> ax.set_ylabel('phi')
+ax.set_xlabel('q')
+ax.set_ylabel('phi')
+plt.show()
 
 ```
 
