@@ -117,6 +117,7 @@ demonstration purposes we'll set the knot position directly from the data.
 Now we can visualize the 'stream':
 
 ```{plot}
+:context:
 :include-source: true
 :context: close-figs
 
@@ -185,6 +186,7 @@ track.plot_all(_gamma, ax=ax, show_tangents=False)
 Now we can visualize the inference result in 2D:
 
 ```{plot}
+:context:
 :include-source: true
 :context: close-figs
 

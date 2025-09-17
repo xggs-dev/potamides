@@ -58,7 +58,14 @@ html_theme_options: dict[str, Any] = {
 
 myst_enable_extensions = [
     "colon_fence",
+    "dollarmath",
+    "amsmath",
+    "attrs_block",
 ]
+
+myst_directives = {
+    "plot": "matplotlib.sphinxext.plot_directive.plot_directive",
+}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
