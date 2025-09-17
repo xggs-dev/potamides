@@ -1,4 +1,4 @@
-#
+# To start
 
 Here is the test using the stream from Jake's paper.
 
@@ -9,7 +9,7 @@ The basic work flow is stream fitting, then
 The stream is 3D. We use only 2D (x-z), for plotting we name it as (x-y)
 
 ```{code-block} python
-# doctet: +SKIP
+# doctest: +SKIP
 
 >>> import numpy as np
 >>> import matplotlib.pyplot as plt
@@ -26,7 +26,7 @@ The stream is 3D. We use only 2D (x-z), for plotting we name it as (x-y)
 
 ```
 
-Here need to maybe upload the plot of the result.
+<!-- Here need to maybe upload the plot of the result.
 
 ## get the representative points along the stream
 
@@ -98,4 +98,4 @@ subset, corresponding to the operation `[42:-4]` here.)
 >>> plt.show()
 ```
 
-(adding the plot)
+(adding the plot) -->
