@@ -182,8 +182,7 @@ found in the `potamides.splinelib` module.
 
 >>> ranges = {"q1": (0.1, 2), "phi": (-np.pi/2, np.pi / 2)}
 
->>> key = jr.key(0)
->>> skeys = jr.split(key, num=len(ranges))
+>>> key, skeys = jr.split(jr.key(0), num=len(ranges) + 1)
 >>> nsamples = 1_000_000
 >>> params = {
     k: jr.uniform(skey, minval=v[0], maxval=v[1], shape=nsamples)
