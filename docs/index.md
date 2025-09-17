@@ -119,7 +119,6 @@ Now we can visualize the 'stream':
 ```{plot}
 :context:
 :include-source: true
-:context: close-figs
 
 fig, ax = plt.subplots(figsize=(figsize, figsize), dpi=150)
 _gamma = jnp.linspace(track.gamma.min(), track.gamma.max(), num=8)  # for plotting only
@@ -188,7 +187,6 @@ Now we can visualize the inference result in 2D:
 ```{plot}
 :context:
 :include-source: true
-:context: close-figs
 
 hist2d_kw = {
     "bins": 20,

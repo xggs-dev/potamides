@@ -5,8 +5,8 @@
 :caption: API submodules
 :glob:
 
-splib.md
-*
+splinelib.md
+
 ```
 
 ---

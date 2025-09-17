@@ -8,6 +8,7 @@ __all__ = [
 
 import functools as ft
 from dataclasses import dataclass
+from typing import Annotated as Antd
 from typing import Any, Literal, final
 
 import equinox as eqx
@@ -33,18 +34,9 @@ class AbstractTrack:
     arc-length of the track. A good definition of gamma is to normalize the
     arc-length to the range [-1, 1], such that
 
-    .. math::
+    $$ \gamma = \frac{2s}{L} - 1, $$
 
-        \gamma = \frac{2s}{L} - 1,
-
-    where :math:`s` is the arc-length and :math:`L` is the total arc-length of the track.
-
-    Parameters
-    ----------
-    ridge_line : interpax.Interpolator1D[(N, F), method="cubic2"]
-        The spline interpolator for the track, parametrized by gamma. It is
-        necessary for the spline to be twice-differentiable (cubic2) to compute
-        the curvature vectors.
+    where $s$ is the arc-length and $L$ is the total arc-length of the track.
 
     Raises
     ------
@@ -141,8 +133,14 @@ class AbstractTrack:
 
     """
 
-    ridge_line: interpax.Interpolator1D
-    "The spline interpolator for the track, parametrized by gamma."
+    ridge_line: Antd[interpax.Interpolator1D, "[(N, F), method='cubic2']"]
+    """The spline interpolator for the track, parametrized by gamma.
+
+    The spline interpolator for the track, parametrized by gamma. It is
+    necessary for the spline to be twice-differentiable (cubic2) to compute
+    the curvature vectors.
+
+    """
 
     def __post_init__(self) -> None:
         _ = eqx.error_if(
@@ -197,7 +195,7 @@ class AbstractTrack:
     @ft.partial(jnp.vectorize, signature="()->(2)", excluded=(0,))
     @ft.partial(jax.jit)
     def spherical_position(self, gamma: SzN, /) -> SzN2:
-        r"""Compute :math:`|\vec{f}(gamma)|` at :math:`gamma`.
+        r"""Compute $$|\vec{f}(gamma)|$$ at $$\gamma$$.
 
         Examples
         --------
@@ -228,9 +226,7 @@ class AbstractTrack:
 
         The tangent vector is defined as:
 
-        .. math::
-
-            T(\gamma) = \frac{d\vec{x}}{d\gamma}
+        $$ T(\gamma) = \frac{d\vec{x}}{d\gamma} $$
 
         Parameters
         ----------
@@ -272,10 +268,9 @@ class AbstractTrack:
 
         This is the norm of the tangent vector at the given position.
 
-        .. math::
-
-            \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma}
-            \right\|
+        $$
+            \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\|
+        $$
 
         An important note is that this is also equivalent to the derivative of
         the arc-length with respect to gamma.
@@ -284,28 +279,27 @@ class AbstractTrack:
         observations of extragalactic stellar streams) the differential
         arc-length is given by:
 
-        .. math::
+        $$
             s = \int_{\gamma_0}^{\gamma} \sqrt{\left(\frac{dx}{d\gamma}\right)^2
-                + \left(\frac{dy}{d\gamma}\right)^2} d\gamma.
+                  + \left(\frac{dy}{d\gamma}\right)^2} d\gamma.
+        $$
 
         Thus, the arc-length element is:
 
-        .. math::
-
+        $$
             \frac{ds}{d\gamma} = \sqrt{\left(\frac{dx}{d\gamma}\right)^2
-                + \left(\frac{dy}{d\gamma}\right)^2}
+                                + \left(\frac{dy}{d\gamma}\right)^2}
+        $$
 
-        If :math:`\gamma` is proportional to the arc-length, which is a very good and
-        common choice, then for :math:`\gamma \in [-1, 1] = \frac{2s}{L} - 1`, we have
+        If $\gamma$ is proportional to the arc-length, which is a very good and
+        common choice, then for $\gamma \in [-1, 1] = \frac{2s}{L} - 1$, we have
 
-        .. math::
+        $$ \frac{ds}{d\gamma} = \frac{L}{2}, $$
 
-            \frac{ds}{d\gamma} = \frac{L}{2},
-
-        where :math:`L` is the total arc-length of the stream.
+        where $L$ is the total arc-length of the stream.
 
         Since this is a constant, there is no need to compute this function. It
-        is sufficient to just use :math:`L/2`. This function is provided for
+        is sufficient to just use $L/2$. This function is provided for
         completeness.
 
         Parameters
@@ -331,10 +325,10 @@ class AbstractTrack:
     ) -> Sz0:
         r"""Return the arc-length of the track.
 
-        .. math::
-
+        $$
             s(\gamma_0, \gamma_1) = \int_{\gamma_0}^{\gamma_1} \left\|
             \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\| \, d\gamma
+        $$
 
         Computing the arc-length requires computing an integral over the norm of
         the tangent vector. This can be done using many different methods. We
@@ -386,7 +380,7 @@ class AbstractTrack:
     def acceleration(self, gamma: Sz0, /) -> Sz2:
         r"""Return the acceleration vector at a given position along the stream.
 
-        The acceleration vector is defined as: :math:`\frac{d^2\vec{x}}{d\gamma^2}`
+        The acceleration vector is defined as: $\frac{d^2\vec{x}}{d\gamma^2}$.
 
         Parameters
         ----------
@@ -396,7 +390,7 @@ class AbstractTrack:
         Returns
         -------
         Array[float, (N, 2)]
-            The acceleration vector :math:`\vec{a}` at :math:`\gamma`.
+            The acceleration vector $\vec{a}$ at $\gamma$.
 
         Examples
         --------
@@ -438,7 +432,7 @@ class AbstractTrack:
         Returns
         -------
         Array[float, (N, 2)]
-            The unit normal vector :math:`\hat{N}` at :math:`\gamma`.
+            The unit normal vector $\hat{N}$ at $\gamma$.
 
         Examples
         --------
@@ -472,42 +466,30 @@ class AbstractTrack:
         derivative of the unit tangent vector to the derivative of the
         arc-length with respect to gamma. In other words, if
 
-        .. math::
-
-            \frac{d\hat{T}}{d\gamma} = \frac{ds}{d\gamma} \frac{d\hat{T}}{ds},
+        $$ \frac{d\hat{T}}{d\gamma} = \frac{ds}{d\gamma} \frac{d\hat{T}}{ds}, $$
 
         and since the curvature vector is defined as
 
-        .. math::
+        $$ \frac{d\hat{T}}{ds} = \kappa \hat{N}, $$
 
-            \frac{d\hat{T}}{ds} = \kappa \hat{N},
+        where $\kappa$ is the curvature and $\hat{N}$ the unit normal vector,
+        then dividing $\frac{d\hat{T}}{d\gamma}$ by $\frac{ds}{d\gamma}$ yields
 
-        where :math:`\kappa` is the curvature and :math:`\hat{N}` the unit normal
-        vector, then dividing :math:`\frac{d\hat{T}}{d\gamma}` by :math:`
-        \frac{ds}{d\gamma}` yields
+        $$ \kappa \hat{N} = \frac{d\hat{T}/d\gamma}{ds/d\gamma}. $$
 
-        .. math::
-
-            \kappa \hat{N} = \frac{d\hat{T}/d\gamma}{ds/d\gamma}.
-
-        Here, :math:`\frac{d\hat{T}}{d\gamma}` (computed by ``dThat_dgamma``)
+        Here, $\frac{d\hat{T}}{d\gamma}$ (computed by ``dThat_dgamma``)
         describes how the direction of the tangent changes with respect to the
-        affine parameter :math:`\gamma`, and :math:`\frac{ds}{d\gamma}` (obtained from
+        affine parameter $\gamma$, and $\frac{ds}{d\gamma}$ (obtained from
         state_speed) represents the state speed (i.e. the rate of change of
-        arc-length with respect to :math:`\gamma`).
+        arc-length with respect to $\gamma$).
 
-        This formulation assumes that :math:`\gamma` is chosen to be proportional to
+        This formulation assumes that $\gamma$ is chosen to be proportional to
         the arc-length of the track.
-
-        Parameters
-        ----------
-        gamma
-            The gamma value at which to evaluate the curvature.
 
         Returns
         -------
         Array[float, (N, 2)]
-            The curvature vector :math:`\kappa` at :math:`\gamma`.
+            The curvature vector $\kappa$ at $\gamma$.
 
         Examples
         --------
@@ -532,7 +514,7 @@ class AbstractTrack:
     @ft.partial(jnp.vectorize, signature="()->()", excluded=(0,))
     @ft.partial(jax.jit)
     def kappa(self, gamma: Sz0, /) -> Sz0:
-        r"""Return the scalar curvature :math:`\kappa(\gamma)` along the track.
+        r"""Return the scalar curvature $\kappa(\gamma)$ along the track.
 
         Parameters
         ----------
@@ -542,7 +524,7 @@ class AbstractTrack:
         Returns
         -------
         Array[float, (N, 2)]
-            The scalar curvature :math:`\kappa` at :math:`\gamma`.
+            The scalar curvature $\kappa$ at $\gamma$.
 
         Examples
         --------
@@ -603,7 +585,7 @@ class AbstractTrack:
         c: str = "red",
         knot_size: int = 10,
     ) -> plt.Axes:
-        """Plot the track curve itself with knot points.
+        r"""Plot the track curve itself with knot points.
 
         This method visualizes the parametric track curve as a continuous line
         and overlays the knot points used in the spline interpolation.
@@ -612,18 +594,20 @@ class AbstractTrack:
         ----------
         gamma : Array[float, (N,)]
             The gamma values to evaluate and plot the track at.
-        ax : plt.Axes, optional
-            The matplotlib axes to plot on. If None, creates a new figure.
-        label : str, optional
-            The label for the track curve in the legend.
-        c : str, default "red"
-            The color for the track curve and knot points.
-        knot_size : int, default 10
-            The size of the knot point markers.
+        ax
+            The matplotlib axes to plot on. If `None` (default), creates a new
+            figure.
+        label
+            The label for the track curve in the legend. If `None`, no label is
+            added. Default is r"$\vec{x}$($\gamma$)".
+        c
+            The color for the track curve and knot points. Default is "red".
+        knot_size
+            The size of the knot point markers. Default is 10.
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -672,7 +656,7 @@ class AbstractTrack:
         color: str = "red",
         label: str | None = r"$\hat{T}$",
     ) -> plt.Axes:
-        """Plot the unit tangent vectors along the track.
+        r"""Plot the unit tangent vectors along the track.
 
         This method visualizes the normalized tangent vectors at specified points
         along the track. The tangent vectors show the direction of motion along
@@ -682,20 +666,22 @@ class AbstractTrack:
         ----------
         gamma : Array[float, (N,)]
             The gamma values where tangent vectors will be plotted.
-        ax : plt.Axes, optional
-            The matplotlib axes to plot on. If None, creates a new figure.
-        vec_width : float, default 0.003
-            The width of the quiver arrows.
-        vec_scale : float, default 30
-            The scale factor for arrow lengths (higher = shorter arrows).
-        color : str, default "red"
-            The color of the tangent vector arrows.
-        label : str, optional
-            The label for the tangent vectors in the legend.
+        ax
+            The matplotlib axes to plot on. If `None` (default), creates a new
+            figure.
+        vec_width
+            The width of the quiver arrows. Default is 0.003.
+        vec_scale
+            The scale factor for arrow lengths (higher = shorter arrows). Default is 30.
+        color
+            The color of the tangent vector arrows. Default is "red".
+        label
+            The label for the tangent vectors in the legend. If `None`, no label
+            is added. Default is r"$\hat{T}$".
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -757,7 +743,7 @@ class AbstractTrack:
         color: str = "blue",
         label: str | None = r"$\hat{\kappa}$",
     ) -> plt.Axes:
-        """Plot the principal unit normal vectors (curvature direction) along the track.
+        r"""Plot the principal unit normal vectors along the track.
 
         This method visualizes the principal unit normal vectors at specified points
         along the track. These vectors point in the direction of curvature and are
@@ -767,20 +753,22 @@ class AbstractTrack:
         ----------
         gamma : Array[float, (N,)]
             The gamma values where normal vectors will be plotted.
-        ax : plt.Axes, optional
-            The matplotlib axes to plot on. If None, creates a new figure.
-        vec_width : float, default 0.003
-            The width of the quiver arrows.
-        vec_scale : float, default 30
-            The scale factor for arrow lengths (higher = shorter arrows).
-        color : str, default "blue"
-            The color of the normal vector arrows.
-        label : str, optional
-            The label for the normal vectors in the legend.
+        ax
+            The matplotlib axes to plot on. If `None` (default), creates a new
+            figure.
+        vec_width
+            The width of the quiver arrows. Default is 0.003.
+        vec_scale
+            The scale factor for arrow lengths (higher = shorter arrows). Default is 30.
+        color
+            The color of the normal vector arrows. Default is "blue".
+        label
+            The label for the normal vectors in the legend. If `None` (default),
+            no label is added. Default is r"$\hat{\kappa}$".
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -856,22 +844,23 @@ class AbstractTrack:
             The gravitational potential to evaluate accelerations.
         gamma : Array[float, (N,)]
             The gamma values where acceleration vectors will be plotted.
-        t : float, default 0
-            The time at which to evaluate the potential (for time-dependent potentials).
-        vec_width : float, default 0.003
-            The width of the quiver arrows.
-        vec_scale : float, default 30
-            The scale factor for arrow lengths (higher = shorter arrows).
-        ax : plt.Axes, optional
-            The matplotlib axes to plot on. If None, creates a new figure.
-        label : str, optional
-            The label for the acceleration vectors in the legend.
-        color : str, default "green"
-            The color of the acceleration vector arrows.
+        t
+            The time at which to evaluate the potential (for time-dependent potentials). Default is 0.
+        vec_width
+            The width of the quiver arrows. Default is 0.003.
+        vec_scale
+            The scale factor for arrow lengths (higher = shorter arrows). Default is 30.
+        ax
+            The matplotlib axes to plot on. If `None` (default), creates a new figure.
+        label
+            The label for the acceleration vectors in the legend. If `None`, no
+            label is added. Default is r"$\vec{a}$ (local)".
+        color
+            The color of the acceleration vector arrows. Default is "green".
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -958,31 +947,32 @@ class AbstractTrack:
         ----------
         gamma : Array[float, (N,)]
             The gamma values to evaluate the track and geometry at.
-        potential : galax.potential.AbstractPotential, optional
-            The potential to use for computing local accelerations. If `None`,
-            the local acceleration vectors will not be plotted.
-        ax : plt.Axes, optional
-            The `matplotlib.axes.Axes` object to plot on. If `None`, a new
-            figure and axes will be created. Defaults to `None`.
-        vec_width : float, default 0.003
+        potential : galax.potential.AbstractPotential | None
+            The potential to use for computing local accelerations. If `None` (default), the local acceleration vectors will not be plotted.
+        ax
+            The `matplotlib.axes.Axes` object to plot on. If `None` (default), a
+            new figure and axes will be created.
+        vec_width
             The width of the quiver arrows. Defaults to `0.003`.
-        vec_scale : float, default 30
+        vec_scale
             The scale factor for the quiver arrows. This affects the length of
             the arrows. Defaults to `30`.
-        labels : bool, default True
+        labels
             Whether to show labels. Defaults to `True`.
-        show_tangents : bool, default True
+        show_tangents
             Whether to plot the unit tangent vectors. Defaults to `True`.
-        show_curvature : bool, default True
+        show_curvature
             Whether to plot the unit curvature vectors. Defaults to `True`.
-        curvature_kwargs : dict, optional
-            Additional keyword arguments to pass to the curvature plotting method.
-        acceleration_kwargs : dict, optional
-            Additional keyword arguments to pass to the acceleration plotting method.
+        curvature_kwargs
+            Additional keyword arguments to pass to the curvature plotting
+            method. If `None` (default), no additional arguments are passed.
+        acceleration_kwargs
+            Additional keyword arguments to pass to the acceleration plotting
+            method. If `None` (default), no additional arguments are passed.
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the complete plot.
 
         Examples
@@ -1109,16 +1099,16 @@ class Track(AbstractTrack):
 
     Parameters
     ----------
-    gamma : Array[float, (N,)], optional
-        The parameter values along the track. Must be provided together with `knots`
-        if `ridge_line` is not specified.
-    knots : Array[float, (N, F)], optional
+    gamma : Array[float, (N,)]
+        The parameter values along the track. Must be provided together with
+        `knots` if `ridge_line` is not specified.
+    knots : Array[float, (N, F)]
         The position data points corresponding to gamma values, where F is the
         spatial dimension (typically 2 for x,y coordinates). Must be provided
         together with `gamma` if `ridge_line` is not specified.
-    ridge_line : interpax.Interpolator1D, optional
+    ridge_line : `interpax.Interpolator1D`
         Pre-constructed spline interpolator. If provided, `gamma` and `knots`
-        must be None.
+        must be `None`.
 
     Raises
     ------
@@ -1263,7 +1253,7 @@ class Track(AbstractTrack):
 
         Parameters
         ----------
-        spline : interpax.Interpolator1D
+        spline
             An existing spline interpolator that will be used as the ridge_line
             for the track. The spline must use the "cubic2" method to ensure
             twice-differentiability for curvature computations.
