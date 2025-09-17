@@ -86,6 +86,15 @@ found in the `potamides.splinelib` module.
 >>> import potamides.splinelib as splib
 ```
 
+We will also assume the following imports for computing and visualization:
+
+```{code-block} python
+>>> import functools as ft
+>>> import jax
+>>> import jax.numpy as jnp
+>>> import matplotlib.pyplot as plt
+```
+
 ### Fitting a Stream
 
 ```{code-block} python
