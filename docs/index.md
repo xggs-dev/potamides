@@ -123,7 +123,6 @@ Now we can visualize the 'stream':
 fig, ax = plt.subplots(figsize=(figsize, figsize), dpi=150)
 _gamma = jnp.linspace(track.gamma.min(), track.gamma.max(), num=8)  # for plotting only
 track.plot_all(_gamma, ax=ax, show_tangents=False)
-plt.show()
 ```
 
 ### Initial basic function for calculating the likelihood
@@ -207,8 +206,6 @@ corner.hist2d(
 )
 ax.set_xlabel('q')
 ax.set_ylabel('phi')
-plt.show()
-
 ```
 
 ## Citation
