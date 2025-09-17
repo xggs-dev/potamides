@@ -167,8 +167,9 @@ We will also assume the following imports for computing and visualization:
     return ptd.compute_accelerations(pos3d, **params)
 
 
+>>> @ft.partial(jax.vmap, in_axes=(0, None, None, None))
 >>> @jax.jit
->>> def compute_ln_likelihood_scalar(params, pos2d, unit_curvature, where_straight=None):
+>>> def compute_ln_likelihood(params, pos2d, unit_curvature, where_straight=None):
     unit_acc_xy = compute_acc_hat(params, pos2d)
     where_straight = (
         where_straight
@@ -178,10 +179,6 @@ We will also assume the following imports for computing and visualization:
     return ptd.compute_ln_likelihood(
         unit_curvature, unit_acc_xy, where_straight=where_straight
     ) / len(unit_curvature)
-
-
->>> compute_ln_likelihood = jax.vmap(
-... compute_ln_likelihood_scalar, in_axes=(0, None, None, None))
 
 ```
 
