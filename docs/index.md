@@ -75,18 +75,25 @@ pip install -e .  # editable mode
 
 ## Quickstart
 
+The `potamides` package provides tools for fitting stellar streams with splines
+and inferring the gravitational potential from the stream's curvature and
+acceleration. The high-level workflow uses the object-oriented interface of the
+`potamides.Track` class. Lower-level functions for spline fitting, etc. can be
+found in the `potamides.splinelib` module.
+
+```{code-block} python
+>>> import potamides as ptd
+>>> import potamides.splinelib as splib
+```
+
 ### Fitting a Stream
 
 ```{code-block} python
-
->>> import potamides
->>> from potamides import splinelib as splib
-
 >>> num_knots=6
 >>> fid_gamma, fid_knots = splib.make_increasing_gamma_from_data(xy_centered)
->>> fiducial_spline = interpax.Interpolator1D(fid_gamma, fid_knots, method="cubic2")
+>>> fid_spline = interpax.Interpolator1D(fid_gamma, fid_knots, method="cubic2")
 >>> ref_gamma = jnp.linspace(fid_gamma.min(), fid_gamma.max(), num=128)
->>> ref_points = fiducial_spline(ref_gamma)
+>>> ref_points = fid_spline(ref_gamma)
 >>> knots = splib.optimize_spline_knots(
     splib.default_cost_fn,
     fid_knots,
