@@ -276,9 +276,8 @@ def combine_ln_likelihoods(
 
         \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
 
-    where :math:`n_i` is the number of gamma points, :math:`L_i` is the
-    arc-length, and :math:`\mathcal{L}_i` is the log-likelihood for
-    segment :math:`i`.
+    where $n_i$ is the number of gamma points, $L_i$ is the arc-length, and
+    $\mathcal{L}_i$ is the log-likelihood for segment $i$.
 
     Examples
     --------

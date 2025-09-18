@@ -268,9 +268,7 @@ class AbstractTrack:
 
         This is the norm of the tangent vector at the given position.
 
-        $$
-            \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\|
-        $$
+        $$ \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\| $$
 
         An important note is that this is also equivalent to the derivative of
         the arc-length with respect to gamma.
@@ -279,17 +277,11 @@ class AbstractTrack:
         observations of extragalactic stellar streams) the differential
         arc-length is given by:
 
-        $$
-            s = \int_{\gamma_0}^{\gamma} \sqrt{\left(\frac{dx}{d\gamma}\right)^2
-                  + \left(\frac{dy}{d\gamma}\right)^2} d\gamma.
-        $$
+        $$ s = \int_{\gamma_0}^{\gamma} \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2} d\gamma. $$
 
         Thus, the arc-length element is:
 
-        $$
-            \frac{ds}{d\gamma} = \sqrt{\left(\frac{dx}{d\gamma}\right)^2
-                                + \left(\frac{dy}{d\gamma}\right)^2}
-        $$
+        $$ \frac{ds}{d\gamma} = \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2} $$
 
         If $\gamma$ is proportional to the arc-length, which is a very good and
         common choice, then for $\gamma \in [-1, 1] = \frac{2s}{L} - 1$, we have
@@ -834,9 +826,10 @@ class AbstractTrack:
     ) -> plt.Axes:
         """Plot the local gravitational acceleration vectors along the track.
 
-        This method visualizes the gravitational acceleration vectors from a given
-        potential at specified points along the track. This is useful for understanding
-        how the gravitational field affects the motion along the track.
+        This method visualizes the gravitational acceleration vectors from a
+        given potential at specified points along the track. This is useful for
+        understanding how the gravitational field affects the motion along the
+        track.
 
         Parameters
         ----------
@@ -865,6 +858,8 @@ class AbstractTrack:
 
         Examples
         --------
+        Track with gravitational potential:
+
         .. plot::
            :include-source:
 

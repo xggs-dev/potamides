@@ -2,7 +2,7 @@
 
 First, we need to change the data from numpy to jax numpy
 
-```{code block} python
+```{code-block} python
 >>> import jax
 >>> jax.config.update("jax_enable_x64", True)  # noqa: FBT003
 >>> import jax.numpy as jnp
@@ -14,7 +14,7 @@ First, we need to change the data from numpy to jax numpy
 Here, `num_knots` is a key parameter controlling the spline fit, inndicating how
 many knots the spline is composed of.
 
-```{code block} python
+```{code-block} python
 >>> from potamides import splinelib as splib
 >>> import interpax
 >>> fid_gamma, fid_knots = splib.make_increasing_gamma_from_data(xy_centered)
@@ -25,7 +25,7 @@ many knots the spline is composed of.
 
 Result of the preliminary spline fit
 
-```{code block} python
+```{code-block} python
 >>> plt.figure(figsize=(5,5))
 >>> plt.plot(X,Y,'.')
 >>> plt.plot(0,0,'r*')
@@ -40,7 +40,7 @@ In this step, we reorganized the gamma parameter along with the optimized nodes,
 with the goal of transforming gamma into a linear parameter with respect to arc
 length
 
-```{code block} python
+```{code-block} python
 >>> from xmmutablemap import IMMutableMap
 >>> knots = splib.optimize_spline_knots(
 >>>     splib.default_cost_fn,
@@ -64,7 +64,7 @@ length
 
 visualize the result
 
-```{code block} python
+```{code-block} python
 >>> axlim=50
 >>> figsize=5
 >>> fig, ax = plt.subplots(figsize=(figsize, figsize),dpi=150)

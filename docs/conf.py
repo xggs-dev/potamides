@@ -20,8 +20,7 @@ author: Final[str] = "Sirui"
 version = release = importlib.metadata.version("potamides")
 
 extensions: Final[list[str]] = [
-    "matplotlib.sphinxext.plot_directive",
-    "myst_parser",
+    "myst_nb",
     "sphinx_design",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
@@ -30,6 +29,7 @@ extensions: Final[list[str]] = [
     "sphinx.ext.napoleon",
     # "sphinx_autodoc_typehints",
     "sphinx_copybutton",
+    "matplotlib.sphinxext.plot_directive",
 ]
 
 source_suffix: Final[list[str]] = [".rst", ".md"]
@@ -115,11 +115,20 @@ import numpy as np
 always_document_param_types: Final = True
 
 
-nitpick_ignore_regex: Final[list[tuple[str, str]]] = [
-    ("py:class", r"^\((?:\s*(?:\.\.\.|[A-Za-z_]\w*|\d+)\s*,?)+\)$"),
-    ("py:data", r"^\((?:\s*(?:\.\.\.|[A-Za-z_]\w*|\d+)\s*,?)+\)$"),
-]
+# Tuples: "(N,)", "(N, 2)", "(n1, n2, n3)", "(..., 2)", etc.
+_SHAPE_TUPLE_RE: Final[str] = (
+    r"^\(\s*(?:\.\.\.|[A-Za-z_]\w*|\d+)(?:\s*,\s*(?:\.\.\.|[A-Za-z_]\w*|\d+))*\s*\)$"
+)
 
+# Only allow these tokens: N, S, 1, 2, or literal "..."
+_SHAPE_NAME_RE: Final[str] = r"^(?:F|N|S|1|2|\.\.\.)$"
+
+nitpick_ignore_regex: Final[list[tuple[str, str]]] = [
+    ("py:class", _SHAPE_TUPLE_RE),
+    ("py:data", _SHAPE_TUPLE_RE),
+    ("py:class", _SHAPE_NAME_RE),
+    ("py:data", _SHAPE_NAME_RE),
+]
 
 # -----------------------------------------------------------------------------
 # --- Auto-link bare tokens like "Array" only inside parameter/return terms ----
