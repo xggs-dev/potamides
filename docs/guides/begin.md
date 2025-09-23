@@ -41,7 +41,7 @@ Because the straight segment is hard to calculate the curvature, and if we set
 the curvature to 0, this part will be no contribution to the inference. So we
 skip the part
 
-```{code-block} python
+```{doctest}
 >>> X, Y = x, y
 
 >>> # Original angles in the range (-π, π]
