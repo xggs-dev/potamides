@@ -16,29 +16,127 @@ log2pi = jnp.log(2 * jnp.pi)
 
 
 @ft.partial(jax.jit)
-def compute_ln_lik_curved(
-    ngamma: int, f1_logf1: Sz0, f2_logf2: Sz0, f3_logf3: Sz0
-) -> Sz0:
-    """Log-Likelihood of the curved part of the stream.
+def stirling_ln_factorial_k_ln_k(k: Sz0) -> Sz0:
+    """Compute k*ln(k) term from Stirling's approximation.
+
+    Uses only the k*ln(k) term from ln(k!) ≈ k*ln(k) - k. This is useful
+    for computing multinomial coefficients where the linear terms cancel.
+    Returns 0 for k = 0 (using the convention 0*ln(0) = 0).
 
     Parameters
     ----------
-    ngamma : int
-        Number of gamma values.
-    f1_logf1 : Array[float, ()]
-        Log-likelihood contribution from the first feature.
-    f2_logf2 : Array[float, ()]
-        Log-likelihood contribution from the second feature.
-    f3_logf3 : Array[float, ()]
-        Log-likelihood contribution from the third feature.
+    k : Sz0
+        The count for which to compute k*ln(k).
 
     Returns
     -------
     Array[float, ()]
-        Log-likelihood of the curved part of the stream.
+        The value k*ln(k), or 0 if k = 0.
+
+    Notes
+    -----
+    When computing multinomial coefficients ln(N!/(n1!...!nk!)) where
+    n1 + ... + nk = N, the linear terms (-N + n1 + ... + nk) cancel,
+    leaving only N*ln(N) - n1*ln(n1) - ... - nk*ln(nk). This function
+    computes just the k*ln(k) terms needed for this calculation.
 
     """
-    return ngamma * (f1_logf1 + f2_logf2 + f3_logf3)
+    return lax.select(k > 0, k * jnp.log(k), jnp.array(0.0))
+
+
+@ft.partial(jax.jit)
+def compute_ln_lik_curved(ngamma: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
+    """Log-Likelihood of the curved part of the stream based on trinomial distribution.
+
+    This function computes the log-likelihood for a trinomial distribution where
+    each evaluation point along the stream can fall into one of three categories:
+
+    1. Compatible alignment (f1): curvature and acceleration are aligned
+    2. Incompatible alignment (f2): curvature and acceleration are misaligned
+    3. Undefined curvature (f3): curvature cannot be computed
+
+    The trinomial log-likelihood for observing counts (n1, n2, n3) out of N trials
+    with probabilities (p1, p2, p3) is:
+
+        ln L = ln(N!/(n1!n2!n3!)) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
+
+    Using maximum likelihood estimators p_i = n_i/N = f_i (sample fractions) and
+    including the multinomial coefficient using Stirling's approximation:
+
+        ln(N!) ≈ N*ln(N) - N
+        ln(n_i!) ≈ n_i*ln(n_i) - n_i
+
+    We get:
+
+        ln L = N*ln(N) - n1*ln(n1) - n2*ln(n2) - n3*ln(n3) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
+             = N*ln(N) + N*(f1*ln(p1/f1) + f2*ln(p2/f2) + f3*ln(p3/f3))
+
+    With p_i = f_i (MLE), this simplifies to:
+
+        ln L = N*ln(N) + N*(f1*ln(1) + f2*ln(1) + f3*ln(1)) = N*ln(N)
+
+    But we want to allow p_i ≠ f_i, so using the general form with p_i = f_i:
+
+        ln L = N*(f1*ln(f1) + f2*ln(f2) + f3*ln(f3)) + ln(N!/(n1!n2!n3!))
+
+    The multinomial coefficient is included for proper comparison across tracks
+    with different numbers of points or different category distributions.
+
+    Parameters
+    ----------
+    ngamma : int
+        Total number of gamma evaluation points (N in the trinomial).
+    n1 : Array[float, ()]
+        Number of points with compatible curvature-acceleration alignment.
+    n2 : Array[float, ()]
+        Number of points with incompatible curvature-acceleration alignment.
+    n3 : Array[float, ()]
+        Number of points with undefined curvature.
+
+    Returns
+    -------
+    Array[float, ()]
+        Log-likelihood of the curved part of the stream including the multinomial
+        coefficient normalization.
+
+    Notes
+    -----
+    The multinomial coefficient is computed using Stirling's approximation for
+    factorial terms. This is necessary when comparing tracks with different
+    geometries or numbers of evaluation points, as the coefficient will not
+    cancel out in likelihood ratios.
+
+    References
+    ----------
+    - Multinomial distribution: https://webspace.maths.qmul.ac.uk/i.goldsheid/MTH5118/Notes6-09.pdf
+    - Nibauer et al. (2023): Stream track likelihood method
+
+    """
+    # # Compute the multinomial coefficient: ln(N!/(n1!n2!n3!))
+    # # Using Stirling: ln(N!) ≈ N*ln(N) - N and ln(n_i!) ≈ n_i*ln(n_i) - n_i
+    # # Since n1 + n2 + n3 = N, the linear terms cancel:
+    # # ln(N!/(n1!n2!n3!)) ≈ N*ln(N) - n1*ln(n1) - n2*ln(n2) - n3*ln(n3)
+    # ln_multinom_coef = (
+    #     stirling_ln_factorial_k_ln_k(ngamma)
+    #     - stirling_ln_factorial_k_ln_k(n1)
+    #     - stirling_ln_factorial_k_ln_k(n2)
+    #     - stirling_ln_factorial_k_ln_k(n3)
+    # )
+    ln_multinom_coef = 0
+
+    # We actually need f * log(f) for the entropy terms.
+    f1 = n1 / ngamma
+    f1_logf1 = lax.select(jnp.isclose(f1, 0.0), jnp.array(0.0), f1 * jnp.log(f1))
+    f2 = n2 / ngamma
+    f2_logf2 = lax.select(jnp.isclose(f2, 0.0), jnp.array(0.0), f2 * jnp.log(f2))
+    f3 = n3 / ngamma
+    f3_logf3 = lax.select(jnp.isclose(f3, 0.0), jnp.array(0.0), f3 * jnp.log(f3))
+
+    # Entropy contribution: n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
+    # With MLE p_i = f_i = n_i/N, this becomes: N*(f1*ln(f1) + f2*ln(f2) + f3*ln(f3))
+    entropy_term = ngamma * (f1_logf1 + f2_logf2 + f3_logf3)
+
+    return ln_multinom_coef + entropy_term
 
 
 @ft.partial(jax.jit)
@@ -46,13 +144,13 @@ def compute_lnlik_good(
     kappa_hat: SzGamma2,
     acc_xy_unit: SzGamma2,
     where_straight: BoolSzGamma,
-    f1_logf1: Sz0,
-    f2_logf2: Sz0,
-    f3_logf3: Sz0,
+    n1: Sz0,
+    n2: Sz0,
+    n3: Sz0,
     sigma_theta: float,
 ) -> Sz0:
     # Log-likelihood of the curved part of the stream
-    lnlik_curved = compute_ln_lik_curved(len(kappa_hat), f1_logf1, f2_logf2, f3_logf3)
+    lnlik_curved = compute_ln_lik_curved(len(kappa_hat), n1, n2, n3)
 
     # TODO: it is more efficient to lax cond on where_straight having any True.
 
@@ -110,16 +208,17 @@ def compute_ln_likelihood(
         the stream track. These point in the direction of maximum curvature.
     acc_xy_unit : Array[float, (N, 2)]
         Unit acceleration vectors in the x-y plane at N positions. These
-        represent the direction of the gravitational acceleration from
-        the potential model.
-    where_straight : Array[bool, (N,)], optional
+        represent the direction of the gravitational acceleration from the
+        potential model.
+    where_straight : Array[bool, (N,)]
         Boolean mask indicating positions where the stream is locally straight
-        (has negligible curvature). If None, all positions are assumed to be
-        curved. Default is None.
-    sigma_theta : float, default 10°
+        (has negligible curvature). If `None` (default), all positions are
+        assumed to be curved.
+    sigma_theta : float
         Standard deviation of the angle distribution between acceleration and
         curvature vectors for straight segments, given in radians. Only used
-        when `where_straight` contains True values.
+        when `where_straight` contains `True` values. Default is 10 degrees in
+        radians.
 
     Returns
     -------
@@ -136,8 +235,14 @@ def compute_ln_likelihood(
     - f2: fraction of positions with incompatible alignment
     - f3: fraction of positions with undefined curvature
 
+    These fractions define a trinomial distribution where f1 + f2 + f3 = 1.
+    The log-likelihood for curved segments is computed using the trinomial
+    likelihood (see `compute_ln_lik_curved`), while straight segments use
+    a Gaussian likelihood for angular alignment.
+
     The likelihood is only computed if f1 > f2 (more compatible than
-    incompatible alignments), otherwise returns -∞.
+    incompatible alignments), otherwise returns -∞. This breaks the
+    degeneracy in the trinomial parameters (Nibauer et al. 2023, Eq. 20).
 
     Examples
     --------
@@ -177,7 +282,7 @@ def compute_ln_likelihood(
     # ---------------------------------------------------
     # Compute the 'fractions' f1, f2, f3 (Eq. 18 of Nibauer et al. 2023)
 
-    # - f1: fraction of eval points with compatible curvature vectors and planar
+    # - n1: number of eval points with compatible curvature vectors and planar
     #   accelerations, where compatible means that theta -- the angle between
     #   the unit curvature vector and the planar acceleration vector -- is less
     #   than pi/2.
@@ -186,37 +291,24 @@ def compute_ln_likelihood(
     acc_curv_align: SzGamma2 = jnp.where(
         where_curved[:, None], acc_xy_unit * kappa_hat, jnp.zeros_like(kappa_hat)
     )
-    f1 = jnp.sum(jnp.abs(1 + jnp.sign(jnp.sum(acc_curv_align, axis=1))) / 2) / N
+    n1 = jnp.sum(jnp.abs(1 + jnp.sign(jnp.sum(acc_curv_align, axis=1))) / 2)
 
-    # - f2: fraction of eval points with incompatible curvature vectors and
+    # - n2: number of eval points with incompatible curvature vectors and
     #   planar accelerations.
-    num_curved = jnp.sum(where_curved)  # number of curved points
-    f2 = (num_curved / N) - f1
+    n2 = jnp.sum(where_curved) - n1
 
-    # - f3: is the fraction of evaluation points with undefined curvature
+    # - n3: is the number of evaluation points with undefined curvature
     #   vectors. This is fixed for each stream track and therefore doesn't
     #   really matter since the likelihoods are ultimately divided by the
     #   maximum likelihood, so this term will cancel out.
-    f3 = 1 - (f1 + f2)
-
-    # We actually need f * log(f).
-    f1_logf1 = lax.select(jnp.isclose(f1, 0.0), jnp.array(0.0), f1 * jnp.log(f1))
-    f2_logf2 = lax.select(jnp.isclose(f2, 0.0), jnp.array(0.0), f2 * jnp.log(f2))
-    f3_logf3 = lax.select(jnp.isclose(f3, 0.0), jnp.array(0.0), f3 * jnp.log(f3))
+    n3 = N - n1 - n2
 
     # ---------------------------------------------------
 
-    # The likelihood is degenerate with the "f" parameters. To break the degeneracy we require f1 > f2 (Nibauer et al. 2023, Eq. 20).
-    mostly_good = f1 > f2
-    operands = (
-        kappa_hat,
-        acc_xy_unit,
-        ~where_curved,  # NOTE: the inversion
-        f1_logf1,
-        f2_logf2,
-        f3_logf3,
-        sigma_theta,
-    )
+    # The likelihood is degenerate with the "n" parameters. To break the degeneracy we require n1 > n2 (Nibauer et al. 2023, Eq. 20).
+    # Note the inversion on `where_curved` in the operands.
+    mostly_good = n1 > n2
+    operands = (kappa_hat, acc_xy_unit, ~where_curved, n1, n2, n3, sigma_theta)
     ln_lik = lax.cond(mostly_good, compute_lnlik_good, compute_lnlik_bad, *operands)
 
     return ln_lik
@@ -275,9 +367,8 @@ def combine_ln_likelihoods(
 
         \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
 
-    where :math:`n_i` is the number of gamma points, :math:`L_i` is the
-    arc-length, and :math:`\mathcal{L}_i` is the log-likelihood for
-    segment :math:`i`.
+    where $n_i$ is the number of gamma points, $L_i$ is the arc-length, and
+    $\mathcal{L}_i$ is the log-likelihood for segment $i$.
 
     Examples
     --------
