@@ -212,93 +212,50 @@ def compute_lnlik_good(
     return lnlik_curved + lnlik_straight
 
 
-@ft.partial(jax.jit)
-def stirling_ln_factorial_k_ln_k(k: Sz0) -> Sz0:
-    """Compute k*ln(k) term from Stirling's approximation.
-
-    Uses only the k*ln(k) term from ln(k!) ≈ k*ln(k) - k. This is useful
-    for computing multinomial coefficients where the linear terms cancel.
-    Returns 0 for k = 0 (using the convention 0*ln(0) = 0).
-
-    Parameters
-    ----------
-    k : Sz0
-        The count for which to compute k*ln(k).
-
-    Returns
-    -------
-    Array[float, ()]
-        The value k*ln(k), or 0 if k = 0.
-
-    Notes
-    -----
-    When computing multinomial coefficients ln(N!/(n1!...!nk!)) where
-    n1 + ... + nk = N, the linear terms (-N + n1 + ... + nk) cancel,
-    leaving only N*ln(N) - n1*ln(n1) - ... - nk*ln(nk). This function
-    computes just the k*ln(k) terms needed for this calculation.
-
-    """
-    return lax.select(k > 0, k * jnp.log(k), jnp.array(0.0))
-
-
-def klogk(k: Sz0) -> Sz0:
+@ft.partial(jax.jit, static_argnames=("threshold",))
+def klogk(k: Sz0, *, threshold: float = 0.0) -> Sz0:
     """Compute k*log(k) with the convention that 0*log(0) = 0.
 
     Parameters
     ----------
     k : Sz0
         Input value.
+    threshold : float, optional
+        Minimum value below which k is treated as zero. Default is 0.0.
 
     Returns
     -------
     Sz0
-        Computed value of k*log(k), or 0 if k = 0.
+        Computed value of k*log(k), or 0 if k <= threshold.
 
     """
-    return lax.select(jnp.isclose(k, 0.0), jnp.array(0.0), k * jnp.log(k))
+    return lax.select(k > threshold, k * jnp.log(k), jnp.array(0.0))
 
 
 @ft.partial(jax.jit)
-def compute_ln_lik_curved(ngamma: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
-    """Log-Likelihood of the curved part of the stream based on trinomial distribution.
+def compute_ln_lik_curved(N: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
+    """Log-Likelihood of the curved portion based on trinomial distribution.
 
     This function computes the log-likelihood for a trinomial distribution where
     each evaluation point along the stream can fall into one of three categories:
 
-    1. Compatible alignment (f1): curvature and acceleration are aligned
-    2. Incompatible alignment (f2): curvature and acceleration are misaligned
-    3. Undefined curvature (f3): curvature cannot be computed
+    1. Compatible alignment (n1): curvature and acceleration are aligned
+    2. Incompatible alignment (n2): curvature and acceleration are misaligned
+    3. Undefined curvature (n3): curvature cannot be computed (e.g., straight
+       segments)
 
-    The trinomial log-likelihood for observing counts (n1, n2, n3) out of N trials
-    with probabilities (p1, p2, p3) is:
+    The trinomial log-likelihood for observing counts (n1, n2, n3) out of N
+    trials with probabilities (p1, p2, p3) is:
 
-        ln L = ln(N!/(n1!n2!n3!)) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
+        $$ ln L = ln(N!/(n1!n2!n3!)) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3) $$
 
-    Using maximum likelihood estimators p_i = n_i/N = f_i (sample fractions) and
-    including the multinomial coefficient using Stirling's approximation:
+    If we are comparing potential models for fixed stream model, we can use the maximum likelihood estimators p_i = n_i/N = f_i (sample fractions) and exclude the normalization coefficient. This gives the simplified form:
 
-        ln(N!) ≈ N*ln(N) - N
-        ln(n_i!) ≈ n_i*ln(n_i) - n_i
-
-    We get:
-
-        ln L = N*ln(N) - n1*ln(n1) - n2*ln(n2) - n3*ln(n3) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
-             = N*ln(N) + N*(f1*ln(p1/f1) + f2*ln(p2/f2) + f3*ln(p3/f3))
-
-    With p_i = f_i (MLE), this simplifies to:
-
-        ln L = N*ln(N) + N*(f1*ln(1) + f2*ln(1) + f3*ln(1)) = N*ln(N)
-
-    But we want to allow p_i ≠ f_i, so using the general form with p_i = f_i:
-
-        ln L = N*(f1*ln(f1) + f2*ln(f2) + f3*ln(f3)) + ln(N!/(n1!n2!n3!))
-
-    The multinomial coefficient is included for proper comparison across tracks
-    with different numbers of points or different category distributions.
+        $$ ln L = n1*ln(n1) + n2*ln(n2) + n3*ln(n3) - N*ln(N) $$
 
     Parameters
     ----------
-    ngamma : int
+    N : int
         Total number of gamma evaluation points (N in the trinomial).
     n1 : Array[float, ()]
         Number of points with compatible curvature-acceleration alignment.
@@ -313,24 +270,10 @@ def compute_ln_lik_curved(ngamma: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
         Log-likelihood of the curved part of the stream including the multinomial
         coefficient normalization.
 
-    Notes
-    -----
-    The multinomial coefficient is computed using Stirling's approximation for
-    factorial terms. This is necessary when comparing tracks with different
-    geometries or numbers of evaluation points, as the coefficient will not
-    cancel out in likelihood ratios.
-
-    References
-    ----------
-    - Multinomial distribution: https://webspace.maths.qmul.ac.uk/i.goldsheid/MTH5118/Notes6-09.pdf
-    - Nibauer et al. (2023): Stream track likelihood method
-
     """
     # Entropy contribution: n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
-    # With MLE p_i = f_i = n_i/N, this becomes: N*(f1*ln(f1) + f2*ln(f2) + f3*ln(f3))
-    entropy_term = klogk(n1) + klogk(n2) + klogk(n3) - (n1 + n2 + n3) * jnp.log(ngamma)
-
-    return ln_multinom_coef + entropy_term
+    # With MLE p_i = f_i = n_i/N this becomes:
+    return klogk(n1) + klogk(n2) + klogk(n3) - (n1 + n2 + n3) * jnp.log(N)
 
 
 @ft.partial(jax.jit)
