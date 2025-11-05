@@ -241,6 +241,23 @@ def stirling_ln_factorial_k_ln_k(k: Sz0) -> Sz0:
     return lax.select(k > 0, k * jnp.log(k), jnp.array(0.0))
 
 
+def klogk(k: Sz0) -> Sz0:
+    """Compute k*log(k) with the convention that 0*log(0) = 0.
+
+    Parameters
+    ----------
+    k : Sz0
+        Input value.
+
+    Returns
+    -------
+    Sz0
+        Computed value of k*log(k), or 0 if k = 0.
+
+    """
+    return lax.select(jnp.isclose(k, 0.0), jnp.array(0.0), k * jnp.log(k))
+
+
 @ft.partial(jax.jit)
 def compute_ln_lik_curved(ngamma: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
     """Log-Likelihood of the curved part of the stream based on trinomial distribution.
@@ -309,29 +326,9 @@ def compute_ln_lik_curved(ngamma: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
     - Nibauer et al. (2023): Stream track likelihood method
 
     """
-    # # Compute the multinomial coefficient: ln(N!/(n1!n2!n3!))
-    # # Using Stirling: ln(N!) ≈ N*ln(N) - N and ln(n_i!) ≈ n_i*ln(n_i) - n_i
-    # # Since n1 + n2 + n3 = N, the linear terms cancel:
-    # # ln(N!/(n1!n2!n3!)) ≈ N*ln(N) - n1*ln(n1) - n2*ln(n2) - n3*ln(n3)
-    # ln_multinom_coef = (
-    #     stirling_ln_factorial_k_ln_k(ngamma)
-    #     - stirling_ln_factorial_k_ln_k(n1)
-    #     - stirling_ln_factorial_k_ln_k(n2)
-    #     - stirling_ln_factorial_k_ln_k(n3)
-    # )
-    ln_multinom_coef = 0
-
-    # We actually need f * log(f) for the entropy terms.
-    f1 = n1 / ngamma
-    f1_logf1 = lax.select(jnp.isclose(f1, 0.0), jnp.array(0.0), f1 * jnp.log(f1))
-    f2 = n2 / ngamma
-    f2_logf2 = lax.select(jnp.isclose(f2, 0.0), jnp.array(0.0), f2 * jnp.log(f2))
-    f3 = n3 / ngamma
-    f3_logf3 = lax.select(jnp.isclose(f3, 0.0), jnp.array(0.0), f3 * jnp.log(f3))
-
     # Entropy contribution: n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
     # With MLE p_i = f_i = n_i/N, this becomes: N*(f1*ln(f1) + f2*ln(f2) + f3*ln(f3))
-    entropy_term = ngamma * (f1_logf1 + f2_logf2 + f3_logf3)
+    entropy_term = klogk(n1) + klogk(n2) + klogk(n3) - (n1 + n2 + n3) * jnp.log(ngamma)
 
     return ln_multinom_coef + entropy_term
 
