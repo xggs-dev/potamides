@@ -8,6 +8,7 @@ __all__ = (
 import functools as ft
 from typing import Any
 
+import equinox as eqx
 import jax
 import jax.numpy as jnp
 from jax import lax
@@ -18,7 +19,7 @@ from .custom_types import BoolSzGamma, Sz0, SzGamma2
 log2pi = jnp.log(2 * jnp.pi)
 
 
-@ft.partial(jax.jit)
+@ft.partial(eqx.filter_jit)
 def compute_ln_likelihood(
     kappa_hat: SzGamma2,
     acc_xy_unit: SzGamma2,
