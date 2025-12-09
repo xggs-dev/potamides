@@ -42,10 +42,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage      = "https://github.com/wsr1998/potamides"
-"Bug Tracker" = "https://github.com/wsr1998/potamides/issues"
-Discussions   = "https://github.com/wsr1998/potamides/discussions"
-Changelog     = "https://github.com/wsr1998/potamides/releases"
+Homepage      = "https://github.com/xggs-dev/potamides"
+"Bug Tracker" = "https://github.com/xggs-dev/potamides/issues"
+Discussions   = "https://github.com/xggs-dev/potamides/discussions"
+Changelog     = "https://github.com/xggs-dev/potamides/releases"
 
 
 [dependency-groups]
