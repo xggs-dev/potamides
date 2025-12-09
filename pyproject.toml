@@ -237,16 +237,17 @@ testpaths = [
       "PLR09",   # Too many <...>
       "PLR2004", # Magic value used in comparison
       "RET504",  # Unnecessary assignment before `return` statement
-      "RUF003",  # doesn't like chinese commasx
+      "RUF003",  # doesn't like chinese commas
     ]
 
     [tool.ruff.lint.per-file-ignores]
-      "tests/**" = [
-        "T20",
-      ]
-      "noxfile.py" = [
-        "T20",
-      ]
+      "docs/**" = ["EXE001", "T201"]
+      "tests/**" = ["T20"]
+      "noxfile.py" = ["T20"]
+
+    [tool.ruff.lint.flake8-import-conventions.aliases]
+      potamides = "ptd"
+      "potamides.splinelib" = "splib"
 
 
 [tool.uv.sources]
