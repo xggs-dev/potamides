@@ -73,7 +73,8 @@ def make_test_mpl(s: nox.Session, /) -> None:
     )
 
 
-# ===================================================================
+# =============================================================================
+# Documentation
 
 
 @session(uv_groups=["docs"], reuse_venv=True)
@@ -120,6 +121,10 @@ def build_api_docs(s: nox.Session, /) -> None:
         "--force",
         "src/potamides",
     )
+
+
+# =============================================================================
+# Build
 
 
 @session(uv_groups=["docs"], reuse_venv=True)
