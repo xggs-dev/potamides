@@ -51,8 +51,8 @@ Changelog     = "https://github.com/wsr1998/potamides/releases"
 [dependency-groups]
 dev = [
   "ipykernel>=6.29.5",
-  "pre-commit>=4.1.0",
   { include-group = "docs" },
+  { include-group = "lint" },
   { include-group = "nox" },
   { include-group = "test" },
 ]
@@ -64,13 +64,19 @@ docs = [
   "sphinx_autodoc_typehints",
   "sphinx_copybutton",
 ]
+lint = [
+  "pre-commit>=4.5.0",
+  "pylint==4.0.4",
+]
 nox = [
+  "nox-uv>=0.6.3",
   "nox[uv]>=2025.5.1",
+  "uv>=0.9.16",
 ]
 test = [
   "matplotlib>=3.10.1",
   "optional-dependencies>=0.3.2",
-  "pytest>=8.3",
+  "pytest>=9.0.2",
   "pytest-arraydiff>=0.6.1",
   "pytest-cov>=6.0.0",
   "pytest-mpl>=0.17.0",
@@ -91,33 +97,13 @@ test = [
   build.hooks.vcs.version-file = "src/potamides/_version.py"
 
 
-[tool.uv.sources]
-  galax = { git = "https://github.com/GalacticDynamics/galax.git", rev = "main" }
+[tool.codespell]
+skip = "uv.lock"
+ignore-words-list = "ptd"
 
 
-[tool.pytest.ini_options]
-  minversion = "6.0"
-  addopts = [
-    "--showlocals",
-    "--strict-config",
-    "--strict-markers",
-    "-p no:doctest",    # using sybil
-    "-ra",
-    "--arraydiff",
-    "--arraydiff-reference-path=tests/data",
-    "--mpl-hash-library=tests/baseline/plot_hashes.json"
-  ]
-  xfail_strict = true
-  filterwarnings = [
-    "error",
-    "ignore:.*jax\\.interpreters\\.xla\\.pytype_aval_mappings is deprecated.*:DeprecationWarning",
-    "ignore:No artists with labels found to put in legend.*:UserWarning"
-  ]
-  log_cli_level = "INFO"
-  testpaths = [
-    "src",
-    "tests",
-  ]
+[tool.commitizen]
+name = "cz_gitmoji"
 
 
 [tool.coverage]
@@ -128,6 +114,7 @@ test = [
     '\.\.\.',
     'if typing.TYPE_CHECKING:',
   ]
+
 
 [tool.mypy]
   files = [
@@ -169,6 +156,49 @@ test = [
       "xmmutablemap.*",
     ]
     ignore_missing_imports = true
+
+
+[tool.pylint]
+  py-version = "3.11"
+  ignore-paths = [
+    ".*/_version.py",
+  ]
+  disable = ["invalid-name"]
+  reports.output-format = "colorized"
+  similarities.ignore-imports = "yes"
+  messages_control.disable = [
+    "design",
+    "fixme",
+    "line-too-long",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "wrong-import-position",
+  ]
+
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = [
+  "--showlocals",
+  "--strict-config",
+  "--strict-markers",
+  "-p no:doctest",    # using sybil
+  "-ra",
+  "--arraydiff",
+  "--arraydiff-reference-path=tests/data",
+  "--mpl-hash-library=tests/baseline/plot_hashes.json"
+]
+xfail_strict = true
+filterwarnings = [
+  "error",
+  "ignore:.*jax\\.interpreters\\.xla\\.pytype_aval_mappings is deprecated.*:DeprecationWarning",
+  "ignore:No artists with labels found to put in legend.*:UserWarning"
+]
+log_cli_level = "INFO"
+testpaths = [
+  "src",
+  "tests",
+]
 
 
 [tool.ruff]
@@ -219,18 +249,5 @@ test = [
       ]
 
 
-[tool.pylint]
-  py-version = "3.9"
-  ignore-paths = [
-    ".*/_version.py",
-  ]
-  reports.output-format = "colorized"
-  similarities.ignore-imports = "yes"
-  messages_control.disable = [
-    "design",
-    "fixme",
-    "line-too-long",
-    "missing-function-docstring",
-    "missing-module-docstring",
-    "wrong-import-position",
-  ]
+[tool.uv.sources]
+  galax = { git = "https://github.com/GalacticDynamics/galax.git", rev = "main" }

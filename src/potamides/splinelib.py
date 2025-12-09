@@ -1,6 +1,6 @@
 """Fit smooth spline."""
 
-__all__ = [  # noqa: RUF022
+__all__ = (  # noqa: RUF022
     # Processing data
     "make_gamma_from_data",
     "make_increasing_gamma_from_data",
@@ -29,7 +29,7 @@ __all__ = [  # noqa: RUF022
     "new_gamma_knots_from_spline",
     # Utils
     "interpax_PPoly_from_scipy_UnivariateSpline",
-]
+)
 
 from ._src.splinelib import (
     CostFn,
