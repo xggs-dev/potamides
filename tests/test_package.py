@@ -2,8 +2,8 @@
 
 import importlib.metadata
 
-import potamides as m
+import potamides as ptd
 
 
 def test_version():
-    assert importlib.metadata.version("potamides") == m.__version__
+    assert importlib.metadata.version("potamides") == ptd.__version__
