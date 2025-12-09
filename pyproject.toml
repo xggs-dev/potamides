@@ -99,6 +99,7 @@ test = [
 
 [tool.codespell]
 skip = "uv.lock"
+ignore-words-list = "ptd"
 
 
 [tool.commitizen]
