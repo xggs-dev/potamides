@@ -1,12 +1,12 @@
 """Spline-related tools."""
+# pylint: disable=R0801
 
-__all__ = [
-    # Processing data
+__all__ = (
     "make_gamma_from_data",
     "make_increasing_gamma_from_data",
     "point_to_point_arclenth",
     "point_to_point_distance",
-]
+)
 
 from typing import TypeAlias
 

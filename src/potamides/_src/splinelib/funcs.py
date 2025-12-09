@@ -1,6 +1,6 @@
 """Functional interface to `interpax.Interpolator1D`."""
 
-__all__ = [  # noqa: RUF022
+__all__ = (  # noqa: RUF022
     # ---------
     # Positions
     "position",
@@ -19,7 +19,7 @@ __all__ = [  # noqa: RUF022
     # ---------
     "curvature",
     "kappa",
-]
+)
 
 import functools as ft
 from typing import Any, Final, Literal
@@ -172,9 +172,9 @@ def spherical_position(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> ct.
 
     # 2) angular coordinates up to the second-to-last dimension.
     # Compute partial radii: R[k] = sqrt(x_F^2 + ... + x_{k+1}^2)
-    R = jnp.sqrt(jnp.cumsum(jnp.square(x[1:])[::-1])[::-1])
+    rho = jnp.sqrt(jnp.cumsum(jnp.square(x[1:])[::-1])[::-1])
     # angles $\phi_i = atan2(R_{i+1}, x_i)$
-    phis = jnp.arctan2(R[:-1], x[:-2])
+    phis = jnp.arctan2(rho[:-1], x[:-2])
     phif = jnp.arctan2(x[-1], x[-2])  # last angle is special case
 
     # Pack the coordinates
@@ -290,8 +290,8 @@ def unit_tangent(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> ct.SzF:
      [ 0. -1.]]
 
     """
-    T = tangent(spline, gamma)
-    return T / jnp.linalg.vector_norm(T)
+    t = tangent(spline, gamma)
+    return t / jnp.linalg.vector_norm(t)
 
 
 @ft.partial(jax.jit, inline=True)
@@ -363,7 +363,7 @@ def speed(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> ct.SzF:
 # Arc-length
 
 
-@ft.partial(jax.jit, static_argnames=("num"))
+@ft.partial(jax.jit, static_argnames=("num",))
 def arc_length_p2p(
     spline: interpax.Interpolator1D,
     gamma0: LikeSz0 = -1,
@@ -421,7 +421,7 @@ def arc_length_p2p(
 speed_fn = jax.vmap(speed, in_axes=(None, 0))
 
 
-@ft.partial(jax.jit, static_argnames=("num"))
+@ft.partial(jax.jit, static_argnames=("num",))
 def arc_length_quadtrature(
     spline: interpax.Interpolator1D,
     gamma0: LikeSz0 = -1,
@@ -545,8 +545,7 @@ def arc_length_odeint(
 
     # Use odeint to integrate the ODE.
     s = odeint(ds_dgamma, s0, t, rtol=rtol, atol=atol, mxstep=mxstep, hmax=hmax)
-    arc_length = s[-1]
-    return arc_length
+    return s[-1]
 
 
 _ARC_LENGTH_METHODS: Final = ("p2p", "quad", "ode")
@@ -760,8 +759,8 @@ def principle_unit_normal(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> 
     We can reverse the direction of the track by reversing the order of the
 
     """
-    dThat_dgamma = jax.jacfwd(unit_tangent, argnums=1)(spline, gamma)
-    return dThat_dgamma / jnp.linalg.vector_norm(dThat_dgamma)
+    dthat_dgamma = jax.jacfwd(unit_tangent, argnums=1)(spline, gamma)
+    return dthat_dgamma / jnp.linalg.vector_norm(dthat_dgamma)
 
 
 @ft.partial(jax.jit)
@@ -825,9 +824,9 @@ def curvature(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> ct.SzF:
      [ 0.5  0. ]]
 
     """
-    dThat_dgamma = jax.jacfwd(unit_tangent, argnums=1)(spline, gamma)
+    dthat_dgamma = jax.jacfwd(unit_tangent, argnums=1)(spline, gamma)
     ds_dgamma = speed(spline, gamma)
-    return dThat_dgamma / ds_dgamma
+    return dthat_dgamma / ds_dgamma
 
 
 @ft.partial(jax.jit)

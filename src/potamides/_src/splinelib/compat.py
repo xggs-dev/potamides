@@ -1,8 +1,6 @@
 """Spline-related tools."""
 
-__all__ = [
-    "interpax_PPoly_from_scipy_UnivariateSpline",
-]
+__all__ = ("interpax_PPoly_from_scipy_UnivariateSpline",)
 
 from typing import TypeAlias
 
@@ -48,6 +46,6 @@ def interpax_PPoly_from_scipy_UnivariateSpline(
     """
     # scipy UnivariateSpline -> scipy PPoly. `_eval_args` is specific to some of
     # the scipy splines, so this doesn't scale to all scipy splines :(.
-    scipy_ppoly = scipy.interpolate.PPoly.from_spline(scipy_spl._eval_args)
+    scipy_ppoly = scipy.interpolate.PPoly.from_spline(scipy_spl._eval_args)  # pylint: disable=protected-access
     # Construct the interpax PPoly from the scipy one.
     return interpax.PPoly(c=scipy_ppoly.c, x=scipy_ppoly.x)

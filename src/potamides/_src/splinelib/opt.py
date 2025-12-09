@@ -1,6 +1,6 @@
 """Spline-related tools."""
 
-__all__ = [
+__all__ = (
     "CostFn",
     "concavity_change_cost_fn",
     "data_distance_cost_fn",
@@ -8,7 +8,7 @@ __all__ = [
     "new_gamma_knots_from_spline",
     "optimize_spline_knots",
     "reduce_point_density",
-]
+)
 
 import functools as ft
 from collections.abc import Callable

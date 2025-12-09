@@ -486,20 +486,20 @@ def plot_acceleration_field(
         _, ax = plt.subplots(dpi=150, figsize=(10, 10))
 
     # Position grid
-    X, Y = jnp.meshgrid(
+    x_mesh, y_mesh = jnp.meshgrid(
         np.linspace(*xlim, grid_size),
         jnp.linspace(*ylim, grid_size),
     )
-    Z = jnp.zeros_like(X)
-    pos_grid = jnp.stack([X.ravel(), Y.ravel(), Z.ravel()], axis=1)
+    z_mesh = jnp.zeros_like(x_mesh)
+    pos_grid = jnp.stack([x_mesh.ravel(), y_mesh.ravel(), z_mesh.ravel()], axis=1)
 
     # Acceleration grid
     acc_grid = potential.acceleration(pos_grid, t=0)
     acc_hat_grid = acc_grid / np.linalg.norm(acc_grid, axis=1, keepdims=True)
 
     ax.quiver(
-        X,
-        Y,
+        x_mesh,
+        y_mesh,
         acc_hat_grid[:, 0],
         acc_hat_grid[:, 1],
         color=color,

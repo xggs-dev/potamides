@@ -1,4 +1,5 @@
 """Spline-related tools."""
+# pylint: disable=too-many-lines
 
 __all__ = [
     "AbstractTrack",
@@ -1222,7 +1223,7 @@ class Track(AbstractTrack):
     #: curvature vectors.
     ridge_line: interpax.Interpolator1D
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         gamma: SzGamma | None = None,
         knots: SzGammaF | None = None,
