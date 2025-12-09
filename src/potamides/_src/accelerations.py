@@ -65,28 +65,30 @@ def compute_accelerations(
 
     Parameters
     ----------
-    pos : Array[float, (N, 3)]
-        An array of shape (N, 3) where N is the number of positions. Each position
-        is a 3D coordinate (x, y, z) in kpc.
-    rot_z : float, default 0.0
-        Rotation angle [radians] around the z-axis (applied first).
-    rot_x : float, default 0.0
-        Rotation angle [radians] around the x-axis (applied second).
-    q1, q2, q3 : float, default 1.0
+    pos
+        An array of shape (N, 3) where N is the number of positions. Each
+        position is a 3D coordinate (x, y, z) in kpc.
+    rot_z
+        Rotation angle [radians] around the z-axis (applied first). Default 0.0.
+    rot_x
+        Rotation angle [radians] around the x-axis (applied second). Default 0.0.
+    q1, q2, q3
         Halo axis ratios for the logarithmic potential. q1 and q2 control
         flattening in the x-y plane, q3 controls flattening along z-axis.
-    phi : float, default 0.0
-        Orientation angle [radians] of the halo potential.
-    rs_halo : float, default 16.0
-        Halo scale radius [kpc].
-    vc_halo : float, default 250 km/s converted to kpc/Myr
-        Halo circular velocity.
-    origin : Array[float, (3,)], default [0, 0, 0]
-        Halo center coordinates [kpc].
-    Mdisk : float, default 1.2e10
-        Disk mass [Msun]. Only used if `withdisk` is True.
-    withdisk : bool, default False
-        If True, include a Miyamoto-Nagai disk potential in addition to the halo.
+        Default 1.0.
+    phi
+        Orientation angle [radians] of the halo potential. Default 0.0.
+    rs_halo
+        Halo scale radius [kpc]. Default 16.0 kpc.
+    vc_halo
+        Halo circular velocity. Default 250 km/s converted to kpc/Myr.
+    origin
+        Halo center coordinates [kpc]. Default [0, 0, 0].
+    Mdisk
+        Disk mass [Msun]. Only used if `withdisk` is True. Default 1.2e10.
+    withdisk
+        If True, include a Miyamoto-Nagai disk potential in addition to the
+        halo. Default False.
 
     Returns
     -------
