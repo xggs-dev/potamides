@@ -71,7 +71,7 @@ def compute_accelerations(
     rot_z
         Rotation angle [radians] around the z-axis (applied first). Default 0.0.
     rot_x
-        Rotation angle [radians] around the x-axis (applied second). Default 0.
+        Rotation angle [radians] around the x-axis (applied second). Default 0.0.
     q1, q2, q3
         Halo axis ratios for the logarithmic potential. q1 and q2 control
         flattening in the x-y plane, q3 controls flattening along z-axis.
@@ -81,11 +81,11 @@ def compute_accelerations(
     rs_halo
         Halo scale radius [kpc]. Default 16.0 kpc.
     vc_halo
-        Halo circular velocity. Default 250 km/s converted to kpc/Myr
+        Halo circular velocity. Default 250 km/s converted to kpc/Myr.
     origin
-        Halo center coordinates [kpc]. Default [0, 0, 0]
+        Halo center coordinates [kpc]. Default [0, 0, 0].
     Mdisk
-        Disk mass [Msun]. Only used if `withdisk` is True. Default 1.2e10
+        Disk mass [Msun]. Only used if `withdisk` is True. Default 1.2e10.
     withdisk
         If True, include a Miyamoto-Nagai disk potential in addition to the
         halo. Default False.
