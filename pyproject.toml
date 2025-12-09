@@ -177,7 +177,7 @@ name = "cz_gitmoji"
 
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "9.0"
 addopts = [
   "--showlocals",
   "--strict-config",
@@ -195,10 +195,8 @@ filterwarnings = [
   "ignore:No artists with labels found to put in legend.*:UserWarning"
 ]
 log_cli_level = "INFO"
-testpaths = [
-  "src",
-  "tests",
-]
+testpaths = ["src", "tests", "docs"]
+norecursedirs = ["docs/_build"]
 
 
 [tool.ruff]
