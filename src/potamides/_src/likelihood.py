@@ -1,10 +1,14 @@
 """Curvature analysis functions."""
 
-__all__ = ["combine_ln_likelihoods", "compute_ln_lik_curved", "compute_ln_likelihood"]
+__all__ = (
+    "combine_ln_likelihoods",
+    "compute_ln_likelihood",
+)
 
 import functools as ft
 from typing import Any
 
+import equinox as eqx
 import jax
 import jax.numpy as jnp
 from jax import lax
@@ -15,74 +19,7 @@ from .custom_types import BoolSzGamma, Sz0, SzGamma2
 log2pi = jnp.log(2 * jnp.pi)
 
 
-@ft.partial(jax.jit)
-def compute_ln_lik_curved(
-    ngamma: int, f1_logf1: Sz0, f2_logf2: Sz0, f3_logf3: Sz0
-) -> Sz0:
-    """Log-Likelihood of the curved part of the stream.
-
-    Parameters
-    ----------
-    ngamma : int
-        Number of gamma values.
-    f1_logf1 : Array[float, ()]
-        Log-likelihood contribution from the first feature.
-    f2_logf2 : Array[float, ()]
-        Log-likelihood contribution from the second feature.
-    f3_logf3 : Array[float, ()]
-        Log-likelihood contribution from the third feature.
-
-    Returns
-    -------
-    Array[float, ()]
-        Log-likelihood of the curved part of the stream.
-
-    """
-    return ngamma * (f1_logf1 + f2_logf2 + f3_logf3)
-
-
-@ft.partial(jax.jit)
-def compute_lnlik_good(
-    kappa_hat: SzGamma2,
-    acc_xy_unit: SzGamma2,
-    where_straight: BoolSzGamma,
-    f1_logf1: Sz0,
-    f2_logf2: Sz0,
-    f3_logf3: Sz0,
-    sigma_theta: float,
-) -> Sz0:
-    # Log-likelihood of the curved part of the stream
-    lnlik_curved = compute_ln_lik_curved(len(kappa_hat), f1_logf1, f2_logf2, f3_logf3)
-
-    # TODO: it is more efficient to lax cond on where_straight having any True.
-
-    # Log-likelihood of the straight part of the stream
-    # If no part is straight then `acc_linear_align` is all zeros
-    acc_linear_align = jnp.where(
-        where_straight[:, None],
-        acc_xy_unit * kappa_hat,
-        jnp.zeros_like(kappa_hat),
-    )
-    # Angle between planar acceleration and stream track (Nibauer et al. 2023,
-    # Eq. 15). acc_linear_align = 0 => theta_T = 0
-    theta_T = jnp.pi / 2 - jnp.arccos(jnp.sum(acc_linear_align, axis=1))
-    # The likelihoods of the straight segment (Nibauer et al. 2023, Eq. 16)
-    ln_normal = -0.5 * (
-        log2pi + 2 * jnp.log(sigma_theta) + (theta_T - 0) ** 2 / sigma_theta**2
-    )
-    lnlik_straight = jnp.sum(ln_normal)  # sum to get the total likelihood
-
-    # Return the total log-likelihood
-    return lnlik_curved + lnlik_straight
-
-
-@ft.partial(jax.jit)
-def compute_lnlik_bad(*_: Any) -> Sz0:
-    """Log-Likelihood when the majority of the curved segments are incompatible."""
-    return -jnp.inf
-
-
-@ft.partial(jax.jit)
+@ft.partial(eqx.filter_jit)
 def compute_ln_likelihood(
     kappa_hat: SzGamma2,
     acc_xy_unit: SzGamma2,
@@ -110,16 +47,17 @@ def compute_ln_likelihood(
         the stream track. These point in the direction of maximum curvature.
     acc_xy_unit : Array[float, (N, 2)]
         Unit acceleration vectors in the x-y plane at N positions. These
-        represent the direction of the gravitational acceleration from
-        the potential model.
-    where_straight : Array[bool, (N,)], optional
+        represent the direction of the gravitational acceleration from the
+        potential model.
+    where_straight : Array[bool, (N,)]
         Boolean mask indicating positions where the stream is locally straight
-        (has negligible curvature). If None, all positions are assumed to be
-        curved. Default is None.
-    sigma_theta : float, default 10°
+        (has negligible curvature). If `None` (default), all positions are
+        assumed to be curved.
+    sigma_theta : float
         Standard deviation of the angle distribution between acceleration and
         curvature vectors for straight segments, given in radians. Only used
-        when `where_straight` contains True values.
+        when `where_straight` contains `True` values. Default is 10 degrees in
+        radians.
 
     Returns
     -------
@@ -136,8 +74,14 @@ def compute_ln_likelihood(
     - f2: fraction of positions with incompatible alignment
     - f3: fraction of positions with undefined curvature
 
+    These fractions define a trinomial distribution where f1 + f2 + f3 = 1.
+    The log-likelihood for curved segments is computed using the trinomial
+    likelihood (see `compute_ln_lik_curved`), while straight segments use
+    a Gaussian likelihood for angular alignment.
+
     The likelihood is only computed if f1 > f2 (more compatible than
-    incompatible alignments), otherwise returns -∞.
+    incompatible alignments), otherwise returns -∞. This breaks the
+    degeneracy in the trinomial parameters (Nibauer et al. 2023, Eq. 20).
 
     Examples
     --------
@@ -177,7 +121,7 @@ def compute_ln_likelihood(
     # ---------------------------------------------------
     # Compute the 'fractions' f1, f2, f3 (Eq. 18 of Nibauer et al. 2023)
 
-    # - f1: fraction of eval points with compatible curvature vectors and planar
+    # - n1: number of eval points with compatible curvature vectors and planar
     #   accelerations, where compatible means that theta -- the angle between
     #   the unit curvature vector and the planar acceleration vector -- is less
     #   than pi/2.
@@ -186,40 +130,216 @@ def compute_ln_likelihood(
     acc_curv_align: SzGamma2 = jnp.where(
         where_curved[:, None], acc_xy_unit * kappa_hat, jnp.zeros_like(kappa_hat)
     )
-    f1 = jnp.sum(jnp.abs(1 + jnp.sign(jnp.sum(acc_curv_align, axis=1))) / 2) / N
+    n1 = jnp.sum(jnp.abs(1 + jnp.sign(jnp.sum(acc_curv_align, axis=1))) / 2)
 
-    # - f2: fraction of eval points with incompatible curvature vectors and
+    # - n2: number of eval points with incompatible curvature vectors and
     #   planar accelerations.
-    num_curved = jnp.sum(where_curved)  # number of curved points
-    f2 = (num_curved / N) - f1
+    n2 = jnp.sum(where_curved) - n1
 
-    # - f3: is the fraction of evaluation points with undefined curvature
+    # - n3: is the number of evaluation points with undefined curvature
     #   vectors. This is fixed for each stream track and therefore doesn't
     #   really matter since the likelihoods are ultimately divided by the
     #   maximum likelihood, so this term will cancel out.
-    f3 = 1 - (f1 + f2)
-
-    # We actually need f * log(f).
-    f1_logf1 = lax.select(jnp.isclose(f1, 0.0), jnp.array(0.0), f1 * jnp.log(f1))
-    f2_logf2 = lax.select(jnp.isclose(f2, 0.0), jnp.array(0.0), f2 * jnp.log(f2))
-    f3_logf3 = lax.select(jnp.isclose(f3, 0.0), jnp.array(0.0), f3 * jnp.log(f3))
+    n3 = N - n1 - n2
 
     # ---------------------------------------------------
 
-    # The likelihood is degenerate with the "f" parameters. To break the degeneracy we require f1 > f2 (Nibauer et al. 2023, Eq. 20).
-    mostly_good = f1 > f2
-    operands = (
-        kappa_hat,
-        acc_xy_unit,
-        ~where_curved,  # NOTE: the inversion
-        f1_logf1,
-        f2_logf2,
-        f3_logf3,
-        sigma_theta,
-    )
+    # The likelihood is degenerate with the "n" parameters. To break the degeneracy we require n1 > n2 (Nibauer et al. 2023, Eq. 20).
+    # Note the inversion on `where_curved` in the operands.
+    mostly_good = n1 > n2
+    operands = (kappa_hat, acc_xy_unit, ~where_curved, n1, n2, n3, sigma_theta)
     ln_lik = lax.cond(mostly_good, compute_lnlik_good, compute_lnlik_bad, *operands)
 
     return ln_lik
+
+
+@ft.partial(jax.jit)
+def compute_lnlik_bad(*_: Any) -> Sz0:
+    """Log-Likelihood when the majority of the curved segments are incompatible.
+
+    Returns -∞ to indicate a poor fit when incompatible alignments dominate.
+    """
+    return -jnp.inf
+
+
+@ft.partial(jax.jit)
+def compute_lnlik_good(
+    kappa_hat: SzGamma2,
+    acc_xy_unit: SzGamma2,
+    where_straight: BoolSzGamma,
+    n1: Sz0,
+    n2: Sz0,
+    n3: Sz0,
+    sigma_theta: float,
+) -> Sz0:
+    """Log-Likelihood when the majority of the curved segments are compatible.
+
+    Parameters
+    ----------
+    kappa_hat : SzGamma2
+        Unit curvature vectors (principal normal vectors) at N positions along
+        the stream track. These point in the direction of maximum curvature.
+    acc_xy_unit : SzGamma2
+        Unit acceleration vectors in the x-y plane at N positions. These
+        represent the direction of the gravitational acceleration from the
+        potential model.
+    where_straight : BoolSzGamma
+        Boolean mask indicating positions where the stream is locally straight
+        (has negligible curvature).
+    n1 : Sz0
+        Number of points with compatible curvature-acceleration alignment.
+    n2 : Sz0
+        Number of points with incompatible curvature-acceleration alignment.
+    n3 : Sz0
+        Number of points with undefined curvature.
+    sigma_theta : float
+        Standard deviation of the angle distribution for straight segments.
+
+    Returns
+    -------
+    Sz0
+        Log-likelihood of the good fit case.
+
+    """
+    # Log-likelihood of the curved part of the stream
+    lnlik_curved = compute_ln_lik_curved(len(kappa_hat), n1, n2, n3)
+
+    # TODO: it is more efficient to lax cond on where_straight having any True.
+    lnlik_straight = compute_lnlik_straight(
+        kappa_hat, acc_xy_unit, where_straight, sigma_theta
+    )
+
+    # Return the total log-likelihood
+    return lnlik_curved + lnlik_straight
+
+
+@ft.partial(jax.jit, static_argnames=("threshold",))
+def klogk(k: Sz0, *, threshold: float = 0.0) -> Sz0:
+    """Compute k*log(k) with the convention that 0*log(0) = 0.
+
+    Parameters
+    ----------
+    k : Sz0
+        Input value.
+    threshold : float, optional
+        Minimum value below which k is treated as zero. Default is 0.0.
+
+    Returns
+    -------
+    Sz0
+        Computed value of k*log(k), or 0 if k <= threshold.
+
+    """
+    return lax.select(k > threshold, k * jnp.log(k), jnp.array(0.0))
+
+
+@ft.partial(jax.jit)
+def compute_ln_lik_curved(N: Sz0, n1: Sz0, n2: Sz0, n3: Sz0) -> Sz0:
+    """Log-Likelihood of the curved portion based on trinomial distribution.
+
+    This function computes the log-likelihood for a trinomial distribution where
+    each evaluation point along the stream can fall into one of three categories:
+
+    1. Compatible alignment (n1): curvature and acceleration are aligned
+    2. Incompatible alignment (n2): curvature and acceleration are misaligned
+    3. Undefined curvature (n3): curvature cannot be computed (e.g., straight
+       segments)
+
+    The trinomial log-likelihood for observing counts (n1, n2, n3) out of N
+    trials with probabilities (p1, p2, p3) is:
+
+        $$ ln L = ln(N!/(n1!n2!n3!)) + n1*ln(p1) + n2*ln(p2) + n3*ln(p3) $$
+
+    If we are comparing potential models for fixed stream model, we can use the maximum likelihood estimators p_i = n_i/N = f_i (sample fractions) and exclude the normalization coefficient. This gives the simplified form:
+
+        $$ ln L = n1*ln(n1) + n2*ln(n2) + n3*ln(n3) - N*ln(N) $$
+
+    Parameters
+    ----------
+    N : int
+        Total number of gamma evaluation points (N in the trinomial).
+    n1 : Array[float, ()]
+        Number of points with compatible curvature-acceleration alignment.
+    n2 : Array[float, ()]
+        Number of points with incompatible curvature-acceleration alignment.
+    n3 : Array[float, ()]
+        Number of points with undefined curvature.
+
+    Returns
+    -------
+    Array[float, ()]
+        Log-likelihood of the curved part of the stream including the multinomial
+        coefficient normalization.
+
+    """
+    # Entropy contribution: n1*ln(p1) + n2*ln(p2) + n3*ln(p3)
+    # With MLE p_i = f_i = n_i/N this becomes:
+    return klogk(n1) + klogk(n2) + klogk(n3) - (n1 + n2 + n3) * jnp.log(N)
+
+
+@ft.partial(jax.jit)
+def compute_lnlik_straight(
+    kappa_hat: SzGamma2,
+    acc_xy_unit: SzGamma2,
+    where_straight: BoolSzGamma,
+    sigma_theta: float,
+) -> Sz0:
+    r"""Log-Likelihood of the straight part of the stream.
+
+    This function computes the log-likelihood for stream segments that are
+    locally straight (have negligible curvature). The likelihood is based on the
+    angular alignment between the planar acceleration vectors and the stream
+    track direction.
+
+    For straight segments, we expect the acceleration to be aligned with the
+    stream track. The angle theta_T between the acceleration vector and the
+    track direction is used to compute a Gaussian likelihood:
+
+        $$ ln L = -0.5 * [ln(2π) + 2ln(\sigma_θ) + (θ_T - 0)² / \sigma_θ²] $$
+
+    where $\sigma_θ$ is the standard deviation of the angle distribution,
+    representing the expected spread of angles for straight segments.
+
+    Parameters
+    ----------
+    kappa_hat : SzGamma2
+        Unit curvature vectors (principal normal vectors) at N positions along
+        the stream track. These point in the direction of maximum curvature.
+    acc_xy_unit : SzGamma2
+        Unit acceleration vectors in the x-y plane at N positions. These
+        represent the direction of the gravitational acceleration from the
+        potential model.
+    where_straight : BoolSzGamma
+        Boolean mask indicating positions where the stream is locally straight
+        (has negligible curvature).
+    sigma_theta : float
+        Standard deviation of the angle distribution for straight segments.
+
+    Returns
+    -------
+    Sz0
+        Log-likelihood of the straight part of the stream.
+
+    """
+    # Log-likelihood of the straight part of the stream
+    # If no part is straight then `acc_linear_align` is all zeros
+    acc_linear_align = jnp.where(
+        where_straight[:, None],
+        acc_xy_unit * kappa_hat,
+        jnp.zeros_like(kappa_hat),
+    )
+    # Angle between planar acceleration and stream track (Nibauer et al. 2023,
+    # Eq. 15). acc_linear_align = 0 => theta_T = 0
+    theta_T = jnp.pi / 2 - jnp.arccos(jnp.sum(acc_linear_align, axis=1))
+    # The likelihoods of the straight segment (Nibauer et al. 2023, Eq. 16)
+    ln_normal = -0.5 * (
+        log2pi + 2 * jnp.log(sigma_theta) + (theta_T - 0) ** 2 / sigma_theta**2
+    )
+
+    return jnp.sum(ln_normal)  # sum to get the total likelihood
+
+
+##############################################################################
 
 
 @ft.partial(jnp.vectorize, signature="(n),(n),(n)->()")
@@ -275,9 +395,8 @@ def combine_ln_likelihoods(
 
         \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
 
-    where :math:`n_i` is the number of gamma points, :math:`L_i` is the
-    arc-length, and :math:`\mathcal{L}_i` is the log-likelihood for
-    segment :math:`i`.
+    where $n_i$ is the number of gamma points, $L_i$ is the arc-length, and
+    $\mathcal{L}_i$ is the log-likelihood for segment $i$.
 
     Examples
     --------
