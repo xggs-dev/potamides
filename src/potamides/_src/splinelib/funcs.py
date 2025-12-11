@@ -583,12 +583,12 @@ def arc_length(
         "quad", or "ode". The default is "p2p".
 
         - "p2p": point-to-point distance. This method computes the distance
-            between each pair of points along the track and sums them up.
-            Accuracy is limited by the 1e5 points used.
+          between each pair of points along the track and sums them up.
+          Accuracy is limited by the 1e5 points used.
         - "quad": quadrature. This method uses fixed quadrature to compute
-            the integral. It is the default method. It also uses 1e5 points.
+          the integral. It is the default method. It also uses 1e5 points.
         - "ode": ODE integration. This method uses ODE integration to
-            compute the integral.
+          compute the integral.
 
     See Also
     --------
@@ -661,7 +661,7 @@ def acceleration(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> ct.SzF:
     $$
       \vec{a}(\gamma)
       = \frac{d^2\vec{x}}{d\gamma^2}
-      = \frac{d}{d\gamma} (\frac{d\vec{x}}{d\gamma}).
+      = \frac{d}{d\gamma} \left(\frac{d\vec{x}}{d\gamma}\right).
     $$
 
     Parameters
@@ -711,7 +711,9 @@ def principle_unit_normal(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> 
     vector onto the plane orthogonal to the unit tangent vector, divided by its
     norm:
 
-    $$ \hat{N}(\gamma) = \frac{d\hat{T}/d\gamma}{|d\hat{T}/d\gamma|}. $$
+    $$
+        \hat{N}(\gamma) = \frac{d\hat{T}/d\gamma}{\lVert d\hat{T}/d\gamma \rVert}.
+    $$
 
     where $\hat{T}(\gamma)$ is the unit tangent vector at $\gamma$ and
     $\vec{a}(\gamma)$ is the acceleration vector at $\gamma$. This function is
@@ -755,8 +757,6 @@ def principle_unit_normal(spline: interpax.Interpolator1D, gamma: ct.Sz0, /) -> 
     [[-1.  0.]
      [ 0. -1.]
      [ 1.  0.]]
-
-    We can reverse the direction of the track by reversing the order of the
 
     """
     dthat_dgamma = jax.jacfwd(unit_tangent, argnums=1)(spline, gamma)
