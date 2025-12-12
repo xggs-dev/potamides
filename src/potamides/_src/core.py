@@ -845,18 +845,18 @@ class AbstractTrack:
         gamma : Array[float, (N,)]
             The gamma values where acceleration vectors will be plotted.
         t
-            The time at which to evaluate the potential (for time-dependent potentials). Default is 0.
+            The time at which to evaluate the potential (for time-dependent potentials). Defaults to `0`.
         vec_width
-            The width of the quiver arrows. Default is 0.003.
+            The width of the quiver arrows. Defaults to `0.003`.
         vec_scale
-            The scale factor for arrow lengths (higher = shorter arrows). Default is 30.
+            The scale factor for arrow lengths (higher = shorter arrows). Defaults to `30`.
         ax
             The matplotlib axes to plot on. If `None` (default), creates a new figure.
         label
             The label for the acceleration vectors in the legend. If `None`, no
-            label is added. Default is r"$\vec{a}$ (local)".
+            label is added. Defaults to ``r"$\vec{a}$ (local)"``.
         color
-            The color of the acceleration vector arrows. Default is "green".
+            The color of the acceleration vector arrows. Defaults to `"green"`.
 
         Returns
         -------
