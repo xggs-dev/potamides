@@ -78,13 +78,13 @@ This package builds upon excellent open-source scientific software:
 - **[JAX](https://github.com/google/jax)**: High-performance numerical computing
   with automatic differentiation
 - **[galax](https://github.com/GalacticDynamics/galax)**: Galactic dynamics in
-  Jax
+  JAX
 - **[interpax](https://github.com/f0uriest/interpax)**: Interpolation library
   for JAX
 - **[Astropy](https://www.astropy.org/)**: Community python library for
   astronomy
 - **[unxt](https://github.com/GalacticDynamics/unxt)**: Unitful quantities for
-  Jax
+  JAX
 
 ---
 
