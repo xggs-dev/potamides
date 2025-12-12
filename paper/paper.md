@@ -98,13 +98,13 @@ properties across galaxy types and environments. `Potamides` is designed to
 handle this data volume efficiently.
 
 **3. High-performance parameter space exploration.** Bayesian inference for halo
-parameters requires evaluating likelihoods across larger, multi-dimensional
+parameters requires evaluating likelihoods across large, multi-dimensional
 parameter spaces. Traditional Python implementations would be prohibitively slow
-for such exploration. `Potamides` leverages JAX's just in time (JIT) compilation
+for such exploration. `Potamides` leverages JAX's just-in-time (JIT) compilation
 and automatic vectorization to achieve 10-100x speedups compared to numpy-based
 alternatives, with optional GPU acceleration for even larger performance gains.
 This efficiency is critical for modern sampling methods (e.g., Hamiltonian Monte
-Carlo, nested sampling) that require thousands to millions likelihood
+Carlo, nested sampling) that require thousands to millions of likelihood
 evaluations.
 
 # Acknowledgements
