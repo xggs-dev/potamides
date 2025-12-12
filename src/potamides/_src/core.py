@@ -7,8 +7,7 @@ __all__ = [
 
 import functools as ft
 from dataclasses import dataclass
-from typing import Annotated as Antd
-from typing import Any, Literal, final
+from typing import Annotated, Any, Literal, final
 
 import equinox as eqx
 import galax.potential as gp
@@ -132,12 +131,11 @@ class AbstractTrack:
 
     """
 
-    ridge_line: Antd[interpax.Interpolator1D, "[(N, F), method='cubic2']"]
+    ridge_line: Annotated[interpax.Interpolator1D, "[(N, F), method='cubic2']"]
     """The spline interpolator for the track, parametrized by gamma.
 
-    The spline interpolator for the track, parametrized by gamma. It is
-    necessary for the spline to be twice-differentiable (cubic2) to compute
-    the curvature vectors.
+    This must be twice-differentiable (cubic2) to enable computation of
+    curvature vectors and other second-order geometric properties.
 
     """
 
@@ -595,8 +593,16 @@ class AbstractTrack:
             The label for the track curve in the legend.
         c : str, default "red"
             The color for the track curve and knot points.
+        ls : str, default "-"
+            The line style for the track curve.
+        lw : float, default 1.0
+            The line width for the track curve.
+        l_zorder : int, default 2
+            The z-order for the track line (controls layering).
         knot_size : int, default 10
             The size of the knot point markers.
+        knot_zorder : int, default 1
+            The z-order for the knot points (controls layering).
 
         Returns
         -------
@@ -960,6 +966,8 @@ class AbstractTrack:
             Whether to plot the unit tangent vectors. Defaults to `True`.
         show_curvature
             Whether to plot the unit curvature vectors. Defaults to `True`.
+        track_kwargs : dict, optional
+            Additional keyword arguments to pass to the track plotting method.
         curvature_kwargs : dict, optional
             Additional keyword arguments to pass to the curvature plotting method.
         acceleration_kwargs : dict, optional
