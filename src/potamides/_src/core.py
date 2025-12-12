@@ -1,5 +1,4 @@
 """Spline-related tools."""
-# pylint: disable=too-many-lines
 
 __all__ = [
     "AbstractTrack",
@@ -39,10 +38,11 @@ class AbstractTrack:
 
     Parameters
     ----------
-    ridge_line : interpax.Interpolator1D[(N, F), method="cubic2"]
-        The spline interpolator for the track, parametrized by gamma. It is
-        necessary for the spline to be twice-differentiable (cubic2) to compute
-        the curvature vectors.
+    ridge_line : interpax.Interpolator1D
+        The spline interpolator for the track, parametrized by gamma. Shape
+        should be (N, F) where N is the number of points and F is the spatial
+        dimension. It must use method="cubic2" to be twice-differentiable,
+        which is necessary to compute the curvature vectors.
 
     Raises
     ------
@@ -235,7 +235,7 @@ class AbstractTrack:
 
         Returns
         -------
-        Array[real, (*batch, 2)]
+        Array[real, (\*batch, 2)]
             The tangent vector at the specified position.
 
         Examples
@@ -266,7 +266,7 @@ class AbstractTrack:
     def state_speed(self, gamma: Sz0, /) -> Sz0:
         r"""Return the speed in gamma of the track at a given position.
 
-        This is the norm of the tangent vector at the given position.
+        This is the norm of the tangent vector at the given position:
 
         $$
             \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma}
@@ -293,7 +293,7 @@ class AbstractTrack:
         $$
 
         If $\gamma$ is proportional to the arc-length, which is a very good and
-        common choice, then for $\gamma \in [-1, 1] = \frac{2s}{L} - 1$, we have
+        common choice, then for $\gamma \in [-1, 1] = \frac{2s}{L} - 1$, we have:
 
         $$
             \frac{ds}{d\gamma} = \frac{L}{2},
@@ -349,10 +349,10 @@ class AbstractTrack:
             "quad", or "ode". The default is "p2p".
 
             - "p2p": point-to-point distance. This method computes the distance
-                between each pair of points along the track and sums them up.
-                Accuracy is limited by the 1e5 points used.
+              between each pair of points along the track and sums them up.
+              Accuracy is limited by the 1e5 points used.
             - "quad": quadrature. This method uses fixed quadrature to compute
-                the integral. It is the default method. It also uses 1e5 points.
+              the integral. It is the default method. It also uses 1e5 points.
             - "ode": ODE integration. This method uses ODE integration to
               compute the integral.
 
@@ -590,9 +590,13 @@ class AbstractTrack:
         ax: plt.Axes | None = None,
         label: str | None = r"$\vec{x}$($\gamma$)",
         c: str = "red",
+        ls: str = "-",
+        lw: float = 1.0,
+        l_zorder: int = 2,
         knot_size: int = 10,
+        knot_zorder: int = 1,
     ) -> plt.Axes:
-        """Plot the track curve itself with knot points.
+        r"""Plot the track curve itself with knot points.
 
         This method visualizes the parametric track curve as a continuous line
         and overlays the knot points used in the spline interpolation.
@@ -602,17 +606,24 @@ class AbstractTrack:
         gamma : Array[float, (N,)]
             The gamma values to evaluate and plot the track at.
         ax : plt.Axes, optional
-            The matplotlib axes to plot on. If None, creates a new figure.
         label : str, optional
-            The label for the track curve in the legend.
         c : str, default "red"
-            The color for the track curve and knot points.
         knot_size : int, default 10
-            The size of the knot point markers.
+            The matplotlib axes to plot on. If `None` (default), creates a new
+            figure.
+            The label for the track curve in the legend. If `None`, no label is
+            added. Default is r"$\vec{x}$($\gamma$)".
+            The color for the track curve and knot points. Default is "red".
+        ls
+            The line style for the track curve. Examples: '-', '--', '-.',':'.
+            Default is '-'.
+        lw
+            The lidth of the track curve. Default is 1.0.
+            The size of the knot point markers. Default is 10.
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -644,10 +655,10 @@ class AbstractTrack:
             _, ax = plt.subplots(dpi=150, figsize=(10, 10))
 
         # Plot track itself
-        ax.plot(*self(gamma).T, c=c, ls="-", lw=1, label=label)
+        ax.plot(*self(gamma).T, c=c, ls=ls, lw=lw, label=label, zorder=l_zorder)
 
         # Add the knot points
-        ax.scatter(*self.knots.T, s=knot_size, c=c, zorder=10)
+        ax.scatter(*self.knots.T, s=knot_size, c=c, label="knot", zorder=knot_zorder)
 
         return ax
 
@@ -661,7 +672,7 @@ class AbstractTrack:
         color: str = "red",
         label: str | None = r"$\hat{T}$",
     ) -> plt.Axes:
-        """Plot the unit tangent vectors along the track.
+        r"""Plot the unit tangent vectors along the track.
 
         This method visualizes the normalized tangent vectors at specified points
         along the track. The tangent vectors show the direction of motion along
@@ -684,7 +695,7 @@ class AbstractTrack:
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -746,7 +757,7 @@ class AbstractTrack:
         color: str = "blue",
         label: str | None = r"$\hat{\kappa}$",
     ) -> plt.Axes:
-        """Plot the principal unit normal vectors (curvature direction) along the track.
+        r"""Plot the principal unit normal vectors along the track.
 
         This method visualizes the principal unit normal vectors at specified points
         along the track. These vectors point in the direction of curvature and are
@@ -769,7 +780,7 @@ class AbstractTrack:
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
@@ -835,9 +846,10 @@ class AbstractTrack:
     ) -> plt.Axes:
         """Plot the local gravitational acceleration vectors along the track.
 
-        This method visualizes the gravitational acceleration vectors from a given
-        potential at specified points along the track. This is useful for understanding
-        how the gravitational field affects the motion along the track.
+        This method visualizes the gravitational acceleration vectors from a
+        given potential at specified points along the track. This is useful for
+        understanding how the gravitational field affects the motion along the
+        track.
 
         Parameters
         ----------
@@ -860,11 +872,13 @@ class AbstractTrack:
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the plot.
 
         Examples
         --------
+        Track with gravitational potential:
+
         .. plot::
            :include-source:
 
@@ -933,6 +947,7 @@ class AbstractTrack:
         labels: bool = True,
         show_tangents: bool = True,
         show_curvature: bool = True,
+        track_kwargs: dict[str, Any] | None = None,
         curvature_kwargs: dict[str, Any] | None = None,
         acceleration_kwargs: dict[str, Any] | None = None,
     ) -> plt.Axes:
@@ -968,10 +983,13 @@ class AbstractTrack:
             Additional keyword arguments to pass to the curvature plotting method.
         acceleration_kwargs : dict, optional
             Additional keyword arguments to pass to the acceleration plotting method.
+        track_kwargs
+            Additional keyword arguments to pass to the curvature plotting
+            method. If `None` (default), no additional arguments are passed.
 
         Returns
         -------
-        plt.Axes
+        matplotlib.axes.Axes
             The matplotlib axes containing the complete plot.
 
         Examples
@@ -1041,6 +1059,7 @@ class AbstractTrack:
             jnp.linspace(gamma.min(), gamma.max(), len(gamma) * 10),
             ax=ax,
             label=r"$\vec{x}$($\gamma$)" if labels else None,
+            **(track_kwargs or {}),
         )
 
         # Geometry along the track
@@ -1223,7 +1242,7 @@ class Track(AbstractTrack):
     #: curvature vectors.
     ridge_line: interpax.Interpolator1D
 
-    def __init__(  # pylint: disable=super-init-not-called
+    def __init__(
         self,
         gamma: SzGamma | None = None,
         knots: SzGammaF | None = None,
