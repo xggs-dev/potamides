@@ -1110,7 +1110,7 @@ class Track(AbstractTrack):
         The position data points corresponding to gamma values, where F is the
         spatial dimension (typically 2 for x,y coordinates). Must be provided
         together with `gamma` if `ridge_line` is not specified.
-    ridge_line : `interpax.Interpolator1D`
+    ridge_line : interpax.Interpolator1D
         Pre-constructed spline interpolator. If provided, `gamma` and `knots`
         must be `None`.
 
