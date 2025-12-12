@@ -41,12 +41,6 @@ $\Phi$, the conventional symbol for gravitational potential in astronomy.
 pip install potamides
 ```
 
-### Using uv (for development)
-
-```bash
-uv pip install potamides
-```
-
 ### From source
 
 ```bash
