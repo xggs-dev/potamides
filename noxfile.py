@@ -1,4 +1,8 @@
-"""Configuration for Nox."""
+#!/usr/bin/env -S uv run --script  # noqa: EXE001
+# /// script
+#    dependencies = ["nox", "nox_uv"]
+# ///
+"""Nox setup."""
 
 import argparse
 import shutil
@@ -11,6 +15,18 @@ nox.needs_version = ">=2024.3.2"
 nox.options.default_venv_backend = "uv"
 
 DIR = Path(__file__).parent.resolve()
+
+
+# =============================================================================
+# Full test suite
+
+
+@session(uv_groups=["lint"], reuse_venv=True)
+def comprehensive(s: nox.Session, /) -> None:
+    s.notify("lint")
+    s.notify("test")
+    s.notify("docs")
+
 
 # =============================================================================
 # Linting
@@ -37,6 +53,15 @@ def pylint(s: nox.Session, /) -> None:
 
 # =============================================================================
 # Testing
+
+
+@session(uv_groups=["test"], reuse_venv=True, default=True)
+def test(s: nox.Session, /) -> None:
+    """Run the tests with all optional dependencies.
+
+    Pass --remake-stubs to regenerate type stubs before type checking.
+    """
+    s.notify("pytest", posargs=s.posargs)
 
 
 @session(uv_groups=["test"], reuse_venv=True)
