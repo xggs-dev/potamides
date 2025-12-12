@@ -13,10 +13,5 @@ build:
     - uv run -m sphinx -T -b html -d docs/_build/doctrees -D language=en docs
       $READTHEDOCS_OUTPUT/html
 
-sphinx:
-  builder: html
-  configuration: docs/conf.py
-  fail_on_warning: true
-
 # Don't build any extra formats
 formats: []
