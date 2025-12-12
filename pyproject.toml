@@ -3,7 +3,7 @@ name = "potamides"
 authors = [
   { name = "Jacob Nibauer", email = "jnibauer@princeton.edu" },
   { name = "Nathaniel Starkman", email = "starkman@mit.edu" },
-  { name = "Sirui", email = "gnx996@ku.dk" },
+  { name = "Sirui Wu", email = "gnx996@ku.dk" },
 ]
 description = "Constrain gravitational potential with stream curvature"
 readme = "README.md"
