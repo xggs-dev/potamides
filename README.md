@@ -14,10 +14,9 @@
 ## About
 
 **potamides** is a Python package for constraining gravitational potentials
-using stellar stream curvature analysis. The name is inspierd by Greeek
-ποταμίδες ("potamídes", meaning "river streams"), with the initial "P"
-representing $\Phi$, the conventional symbol for gravitational potential in
-astronomy.
+using stellar stream curvature analysis. The name is inspired by Greek ποταμίδες
+("potamídes", meaning "river streams"), with the initial "P" representing
+$\Phi$, the conventional symbol for gravitational potential in astronomy.
 
 ### Key Features
 
@@ -28,7 +27,7 @@ astronomy.
 - 🌌 **Gravitational field fitting**: Match stream curvature to potential models
   with customizable halo and disk components
 - ⚡ **JAX-accelerated**: Fast, GPU-compatible computations with automatic
-  diffferentiation and JIT compilation
+  differentiation and JIT compilation
 - 📊 **Likelihood framework**: Bayesian inference for potential parameters using
   curvature-acceleration alignment
 - 📈 **Visualization tools**: Built-in plotting methods for tracks, geometry
@@ -65,7 +64,7 @@ uv pip install -e .
 
 ## Quick Start
 
-<span style="color:red">To do</span>
+**TODO**
 
 ## License
 
@@ -74,10 +73,10 @@ for details.
 
 ## Acknowledgments
 
-This package builds upon excellent open-sourcs scientific software:
+This package builds upon excellent open-source scientific software:
 
-- **[JAX](https://github.com/google/jax)**: High-performance nuerical computing
-  with automatic differetiation
+- **[JAX](https://github.com/google/jax)**: High-performance numerical computing
+  with automatic differentiation
 - **[galax](https://github.com/GalacticDynamics/galax)**: Galactic dynamics in
   Jax
 - **[interpax](https://github.com/f0uriest/interpax)**: Interpolation library
