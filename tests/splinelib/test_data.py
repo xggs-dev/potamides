@@ -63,21 +63,21 @@ def test_point_to_point_distance_complex_consistency(
 
 
 @pytest.mark.array_compare
-def test_point_to_point_arclenth_simple_consistency(
+def test_point_to_point_arclength_simple_consistency(
     data_simple: Real[Array, "4 2"],
 ) -> Real[Array, "3"]:
-    r"""Test that point_to_point_arclenth function is consistent for simple data."""
-    out = splib.point_to_point_arclenth(data_simple)
+    r"""Test that point_to_point_arclength function is consistent for simple data."""
+    out = splib.point_to_point_arclength(data_simple)
     assert out.shape == (3,)
     return out
 
 
 @pytest.mark.array_compare
-def test_point_to_point_arclenth_complex_consistency(
+def test_point_to_point_arclength_complex_consistency(
     data_complex: Real[Array, "20 2"],
 ) -> Real[Array, "19"]:
-    r"""Test that point_to_point_arclenth function is consistent for complex data."""
-    out = splib.point_to_point_arclenth(data_complex)
+    r"""Test that point_to_point_arclength function is consistent for complex data."""
+    out = splib.point_to_point_arclength(data_complex)
     assert out.shape == (19,)
     return out
 
@@ -160,10 +160,10 @@ def test_point_to_point_distance_correctness(data_simple) -> None:
     np.testing.assert_allclose(output, expected_output, rtol=1e-5, atol=1e-8)
 
 
-def test_point_to_point_arclenth_correctness(data_simple) -> None:
-    """Test the point_to_point_arclenth function is correct."""
+def test_point_to_point_arclength_correctness(data_simple) -> None:
+    """Test the point_to_point_arclength function is correct."""
     expected_output = jnp.array([1, 3, 4], dtype=float)
-    output = splib.point_to_point_arclenth(data_simple)
+    output = splib.point_to_point_arclength(data_simple)
     np.testing.assert_allclose(output, expected_output, rtol=1e-5, atol=1e-8)
 
 
