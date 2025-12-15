@@ -387,7 +387,7 @@ class AbstractTrack:
 
         Parameters
         ----------
-        gamma
+        gamma : Array[float, ()]
             The gamma value at which to evaluate the acceleration.
 
         Returns
@@ -429,7 +429,7 @@ class AbstractTrack:
 
         Parameters
         ----------
-        gamma
+        gamma : Array[float, ()]
             The gamma value at which to evaluate the normal vector.
 
         Returns
@@ -495,6 +495,11 @@ class AbstractTrack:
         This formulation assumes that :math:`\gamma` is chosen to be proportional to
         the arc-length of the track.
 
+        Parameters
+        ----------
+        gamma : Array[float, ()]
+            The gamma value at which to evaluate the curvature.
+
         Returns
         -------
         Array[float, (N, 2)]
@@ -527,7 +532,7 @@ class AbstractTrack:
 
         Parameters
         ----------
-        gamma
+        gamma : Array[float, ()]
             The gamma value at which to evaluate the curvature.
 
         Returns
@@ -1277,7 +1282,7 @@ class Track(AbstractTrack):
 
         Parameters
         ----------
-        spline
+        spline : interpax.Interpolator1D
             An existing spline interpolator that will be used as the ridge_line
             for the track. The spline must use the "cubic2" method to ensure
             twice-differentiability for curvature computations.
