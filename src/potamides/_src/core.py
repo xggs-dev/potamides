@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 """Spline-related tools."""
 
 __all__ = [
@@ -32,9 +34,11 @@ class AbstractTrack:
     arc-length of the track. A good definition of gamma is to normalize the
     arc-length to the range [-1, 1], such that
 
-    $$ \gamma = \frac{2s}{L} - 1, $$
+    .. math::
 
-    where $s$ is the arc-length and $L$ is the total arc-length of the track.
+        \gamma = \frac{2s}{L} - 1
+
+    where :math:`s` is the arc-length and :math:`L` is the total arc-length of the track.
 
     Raises
     ------
@@ -192,7 +196,7 @@ class AbstractTrack:
     @ft.partial(jnp.vectorize, signature="()->(2)", excluded=(0,))
     @ft.partial(jax.jit)
     def spherical_position(self, gamma: SzN, /) -> SzN2:
-        r"""Compute $$|\vec{f}(gamma)|$$ at $$\gamma$$.
+        r"""Compute :math:`|\vec{f}(gamma)|` at :math:`\gamma`.
 
         Examples
         --------
@@ -223,11 +227,13 @@ class AbstractTrack:
 
         The tangent vector is defined as:
 
-        $$ T(\gamma) = \frac{d\vec{x}}{d\gamma} $$
+        .. math::
+
+            T(\gamma) = \frac{d\vec{x}}{d\gamma}
 
         Parameters
         ----------
-        gamma
+        gamma : Array[float, ()]
             The gamma value at which to evaluate the spline.
 
         Returns
@@ -265,7 +271,9 @@ class AbstractTrack:
 
         This is the norm of the tangent vector at the given position.
 
-        $$ \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\| $$
+        .. math::
+
+            \mathbf{v}(\gamma) = \left\| \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\|
 
         An important note is that this is also equivalent to the derivative of
         the arc-length with respect to gamma.
@@ -274,26 +282,32 @@ class AbstractTrack:
         observations of extragalactic stellar streams) the differential
         arc-length is given by:
 
-        $$ s = \int_{\gamma_0}^{\gamma} \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2} d\gamma. $$
+        .. math::
+
+            s = \int_{\gamma_0}^{\gamma} \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2} d\gamma
 
         Thus, the arc-length element is:
 
-        $$ \frac{ds}{d\gamma} = \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2} $$
+        .. math::
 
-        If $\gamma$ is proportional to the arc-length, which is a very good and
-        common choice, then for $\gamma \in [-1, 1] = \frac{2s}{L} - 1$, we have
+            \frac{ds}{d\gamma} = \sqrt{\left(\frac{dx}{d\gamma}\right)^2 + \left(\frac{dy}{d\gamma}\right)^2}
 
-        $$ \frac{ds}{d\gamma} = \frac{L}{2}, $$
+        If :math:`\gamma` is proportional to the arc-length, which is a very good and
+        common choice, then for :math:`\gamma \in [-1, 1] = \frac{2s}{L} - 1`, we have
 
-        where $L$ is the total arc-length of the stream.
+        .. math::
+
+            \frac{ds}{d\gamma} = \frac{L}{2}
+
+        where :math:`L` is the total arc-length of the stream.
 
         Since this is a constant, there is no need to compute this function. It
-        is sufficient to just use $L/2$. This function is provided for
+        is sufficient to just use :math:`L/2`. This function is provided for
         completeness.
 
         Parameters
         ----------
-        gamma
+        gamma : Array[float, ()]
             The gamma value at which to evaluate the spline.
 
         """
@@ -314,10 +328,10 @@ class AbstractTrack:
     ) -> Sz0:
         r"""Return the arc-length of the track.
 
-        $$
+        .. math::
+
             s(\gamma_0, \gamma_1) = \int_{\gamma_0}^{\gamma_1} \left\|
             \frac{d\mathbf{x}(\gamma)}{d\gamma} \right\| \, d\gamma
-        $$
 
         Computing the arc-length requires computing an integral over the norm of
         the tangent vector. This can be done using many different methods. We
@@ -325,14 +339,12 @@ class AbstractTrack:
 
         Parameters
         ----------
-        gamma0, gamma1
-            The starting / ending gamma value between which to compute the
-            arc-length. The default is [-1, 1], which is the full range of gamma
-            for the track.
-
-        method
-            The method to use for computing the arc-length. Options are "p2p",
-            "quad", or "ode". The default is "p2p".
+        gamma0 : float, optional
+            The starting gamma value. Default is -1.
+        gamma1 : float, optional
+            The ending gamma value. Default is 1.
+        method : {"p2p", "quad", "ode"}, optional
+            The method to use for computing the arc-length. Default is "p2p".
 
             - "p2p": point-to-point distance. This method computes the distance
                 between each pair of points along the track and sums them up.
@@ -341,6 +353,8 @@ class AbstractTrack:
                 the integral. It is the default method. It also uses 1e5 points.
             - "ode": ODE integration. This method uses ODE integration to
               compute the integral.
+        method_kw : dict, optional
+            Additional keyword arguments to pass to the selected method.
 
         """
         return splinelib.arc_length(
@@ -455,30 +469,36 @@ class AbstractTrack:
         derivative of the unit tangent vector to the derivative of the
         arc-length with respect to gamma. In other words, if
 
-        $$ \frac{d\hat{T}}{d\gamma} = \frac{ds}{d\gamma} \frac{d\hat{T}}{ds}, $$
+        .. math::
+
+            \frac{d\hat{T}}{d\gamma} = \frac{ds}{d\gamma} \frac{d\hat{T}}{ds}
 
         and since the curvature vector is defined as
 
-        $$ \frac{d\hat{T}}{ds} = \kappa \hat{N}, $$
+        .. math::
 
-        where $\kappa$ is the curvature and $\hat{N}$ the unit normal vector,
-        then dividing $\frac{d\hat{T}}{d\gamma}$ by $\frac{ds}{d\gamma}$ yields
+            \frac{d\hat{T}}{ds} = \kappa \hat{N}
 
-        $$ \kappa \hat{N} = \frac{d\hat{T}/d\gamma}{ds/d\gamma}. $$
+        where :math:`\kappa` is the curvature and :math:`\hat{N}` the unit normal vector,
+        then dividing :math:`\frac{d\hat{T}}{d\gamma}` by :math:`\frac{ds}{d\gamma}` yields
 
-        Here, $\frac{d\hat{T}}{d\gamma}$ (computed by ``dThat_dgamma``)
+        .. math::
+
+            \kappa \hat{N} = \frac{d\hat{T}/d\gamma}{ds/d\gamma}
+
+        Here, :math:`\frac{d\hat{T}}{d\gamma}` (computed by ``dThat_dgamma``)
         describes how the direction of the tangent changes with respect to the
-        affine parameter $\gamma$, and $\frac{ds}{d\gamma}$ (obtained from
+        affine parameter :math:`\gamma`, and :math:`\frac{ds}{d\gamma}` (obtained from
         state_speed) represents the state speed (i.e. the rate of change of
-        arc-length with respect to $\gamma$).
+        arc-length with respect to :math:`\gamma`).
 
-        This formulation assumes that $\gamma$ is chosen to be proportional to
+        This formulation assumes that :math:`\gamma` is chosen to be proportional to
         the arc-length of the track.
 
         Returns
         -------
         Array[float, (N, 2)]
-            The curvature vector $\kappa$ at $\gamma$.
+            The curvature vector :math:`\kappa` at :math:`\gamma`.
 
         Examples
         --------
