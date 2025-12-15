@@ -1,6 +1,6 @@
 # 1D-inference
 
-```{code block} python
+```{code-block} python
 >>> import potamides as ptd
 >>> import unxt as u
 >>> import jax.random as jr
@@ -56,7 +56,7 @@
 >>>     compute_ln_likelihood_scalar, in_axes=(0, None, None, None)
 >>> )
 
->>> anges = {
+>>> ranges = {
 >>>     "q1": (0.1, 2),
 >>> }
 

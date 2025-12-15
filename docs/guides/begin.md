@@ -1,4 +1,4 @@
-#
+# Stream Fitting and Visualization Guide
 
 Here is the test using the stream from Jake's paper.
 

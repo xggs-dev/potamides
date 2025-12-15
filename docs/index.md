@@ -82,7 +82,7 @@ uv add potamides
 :::{tab-item} source, via pip
 
 ```bash
-pip install git+https://https://github.com/xggs-dev/potamides.git
+pip install git+https://github.com/xggs-dev/potamides.git
 ```
 
 :::
@@ -91,7 +91,7 @@ pip install git+https://https://github.com/xggs-dev/potamides.git
 
 ```bash
 cd /path/to/parent
-git clone https://https://github.com/wsr1998/potamides.git
+git clone https://github.com/xggs-dev/potamides.git
 cd potamides
 pip install -e .  # editable mode
 ```
@@ -132,10 +132,12 @@ practice, you would replace this with your actual stream data.
 ```{code-cell} ipython3
 a, b = 2.0, 1.2  # semi-axes (x, y)
 gamma = jnp.linspace(0, 2 * jnp.pi, 10_000)
-# # Ellipse (oval)
+
+# Option 1: Simple ellipse
 # data = jnp.stack([a * jnp.cos(gamma), b * jnp.sin(gamma)], axis=-1)
-# --- Optional: Egg-shape (uncomment to use) ---
-k = 0.25  # distortion factor; 0 → pure ellipse
+
+# Option 2: Egg-shape (distorted ellipse) - more interesting curvature
+k = 0.25  # distortion factor; k=0 gives a perfect ellipse
 x = a * jnp.cos(gamma) * (1 + k * jnp.cos(gamma))
 y = b * jnp.sin(gamma)
 data = jnp.stack([x, y], axis=-1)
@@ -154,7 +156,7 @@ Now we can visualize the 'stream':
 fig, ax = plt.subplots(figsize=(4, 4), dpi=150)
 _gamma = jnp.linspace(track.gamma.min(), track.gamma.max(), num=8)  # for plotting only
 track.plot_all(_gamma, ax=ax, show_tangents=False)
-plt.show()
+fig
 ```
 
 ### Initial basic function for calculating the likelihood
@@ -267,10 +269,9 @@ This package builds upon excellent open-source scientific software:
 - [Astropy][astropy]: Community Python library for astronomy
 - [unxt][unxt]: Unitful quantities for JAX
 
- <!-- LINKS -->
+<!-- LINKS -->
 
 [astropy]: https://www.astropy.org/
-[coordinax]: https://github.com/GalacticDynamics/coordinax
 [equinox]: https://docs.kidger.site/equinox/
 [galax]: https://github.com/GalacticDynamics/galax
 [interpax]: https://github.com/f0uriest/interpax

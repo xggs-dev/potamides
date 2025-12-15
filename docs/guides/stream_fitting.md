@@ -20,7 +20,7 @@ First, we need to change the data from numpy to jax numpy
 >>> xy_centered = jnp.stack([x_jax, y_jax], axis=1)
 ```
 
-Here, `num_knots` is a key parameter controlling the spline fit, inndicating how
+Here, `num_knots` is a key parameter controlling the spline fit, indicating how
 many knots the spline is composed of.
 
 ```{code-block} python
