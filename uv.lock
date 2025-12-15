@@ -507,6 +507,18 @@ wheels = [
 ]
 
 [[package]]
+name = "corner"
+version = "2.2.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5c/61/2d728798e9ae3bf899d962f77486cb29888d57f6fbf9561bc1435a6b1a74/corner-2.2.3.tar.gz", hash = "sha256:471b7b63395d8f1dee176bb779348ade38d56abd23404a48802a593607745e1c", size = 5932840 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4e/4a/5bd0a8b981c5a93153d9eb7c63143b407cc7f8dfc9f91eedc9b6f5289eca/corner-2.2.3-py3-none-any.whl", hash = "sha256:39674b223482456c3a78234dc7bdefd21188a2d47bb8cd468104a0501f6659ec", size = 15946 },
+]
+
+[[package]]
 name = "coverage"
 version = "7.13.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2116,6 +2128,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "corner" },
     { name = "cz-conventional-gitmoji" },
     { name = "furo" },
     { name = "ipykernel" },
@@ -2140,6 +2153,7 @@ dev = [
     { name = "uv" },
 ]
 docs = [
+    { name = "corner" },
     { name = "furo" },
     { name = "matplotlib" },
     { name = "myst-nb" },
@@ -2160,6 +2174,7 @@ nox = [
     { name = "uv" },
 ]
 test = [
+    { name = "corner" },
     { name = "matplotlib" },
     { name = "optional-dependencies" },
     { name = "pytest" },
@@ -2187,6 +2202,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "corner", specifier = ">=2.2.3" },
     { name = "cz-conventional-gitmoji", specifier = ">=0.7.0" },
     { name = "furo", specifier = ">=2023.8.17" },
     { name = "ipykernel", specifier = ">=6.29.5" },
@@ -2211,6 +2227,7 @@ dev = [
     { name = "uv", specifier = ">=0.9.16" },
 ]
 docs = [
+    { name = "corner", specifier = ">=2.2.3" },
     { name = "furo", specifier = ">=2023.8.17" },
     { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "myst-nb", specifier = ">=1.0.0" },
@@ -2231,6 +2248,7 @@ nox = [
     { name = "uv", specifier = ">=0.9.16" },
 ]
 test = [
+    { name = "corner", specifier = ">=2.2.3" },
     { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "optional-dependencies", specifier = ">=0.3.2" },
     { name = "pytest", specifier = ">=9.0.2" },

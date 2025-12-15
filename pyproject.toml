@@ -58,6 +58,7 @@ dev = [
   "cz-conventional-gitmoji>=0.7.0",
 ]
 docs = [
+  "corner>=2.2.3",
   "furo>=2023.08.17",
   "matplotlib>=3.10.1",
   "myst_nb>=1.0.0",
@@ -78,6 +79,7 @@ nox = [
   "uv>=0.9.16",
 ]
 test = [
+  "corner>=2.2.3",
   "matplotlib>=3.10.1",
   "optional-dependencies>=0.3.2",
   "pytest>=9.0.2",

@@ -32,7 +32,29 @@ api/index.md
 
 # 🚀 Get Started
 
-Potamides is ... in [JAX][jax].
+**potamides** is a Python package for constraining gravitational potentials
+using stellar stream curvature analysis. Built on [JAX][jax], it combines
+spline-based stream modeling with Bayesian inference to extract gravitational
+field parameters from the geometric properties of stellar streams.
+
+The name is inspired by Greek ποταμίδες ("potamídes", meaning "river streams"),
+with the initial "P" representing $\Phi$, the conventional symbol for
+gravitational potential in astronomy.
+
+## Key Features
+
+- 🌊 **Spline-based stream modeling**: Smooth parametric representation of
+  stellar streams with cubic spline interpolation
+- 📐 **Curvature analysis**: Compute geometric properties including tangent
+  vectors, curvature, principal normals, and arc-length
+- 🌌 **Gravitational field fitting**: Match stream curvature to potential models
+  with customizable halo and disk components
+- ⚡ **JAX-accelerated**: Fast, GPU-compatible computations with automatic
+  differentiation and JIT compilation
+- 📊 **Likelihood framework**: Bayesian inference for potential parameters using
+  curvature-acceleration alignment
+- 📈 **Visualization tools**: Built-in plotting methods for tracks, geometry
+  vectors, and gravitational fields
 
 ## Installation
 
@@ -60,7 +82,7 @@ uv add potamides
 :::{tab-item} source, via pip
 
 ```bash
-pip install git+https://https://github.com/wsr1998/potamides.git
+pip install git+https://https://github.com/xggs-dev/potamides.git
 ```
 
 :::
@@ -221,20 +243,39 @@ fig
 
 ## Citation
 
-...
+If you use this software in your research, please cite it as:
+
+```bibtex
+@software{potamides2024,
+  author = {Nibauer, Jacob and Starkman, Nathaniel and Wu, Sirui},
+  title = {potamides: Constraining gravitational potentials with stellar stream curvature},
+  year = {2024},
+  url = {https://github.com/xggs-dev/potamides}
+}
+```
 
 ## Ecosystem
 
-### `potamides`'s Dependencies
+This package builds upon excellent open-source scientific software:
 
-- [Equinox][equinox]: one-stop JAX library, for everything that isn't already in
-  core JAX.
+- [JAX][jax]: High-performance numerical computing with automatic
+  differentiation
+- [galax][galax]: Galactic dynamics in JAX
+- [Equinox][equinox]: One-stop JAX library for everything that isn't already in
+  core JAX
+- [interpax][interpax]: Interpolation library for JAX
+- [Astropy][astropy]: Community Python library for astronomy
+- [unxt][unxt]: Unitful quantities for JAX
 
  <!-- LINKS -->
 
+[astropy]: https://www.astropy.org/
 [coordinax]: https://github.com/GalacticDynamics/coordinax
 [equinox]: https://docs.kidger.site/equinox/
 [galax]: https://github.com/GalacticDynamics/galax
+[interpax]: https://github.com/f0uriest/interpax
+[jax]: https://github.com/google/jax
+[unxt]: https://github.com/GalacticDynamics/unxt
 
 ## Indices and tables
 
