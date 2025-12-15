@@ -138,7 +138,7 @@ def plot_theta_of_gamma(
     r"""Plot angles θ as a function of stream parameter gamma with parameter colormap.
 
     Create a scatter plot showing how the angle between acceleration and normal
-    vectors varies along the stream ($\gamma$) for different parameter values.
+    vectors varies along the stream (:math:`\gamma`) for different parameter values.
     This visualization is crucial for understanding stream dynamics and
     identifying regions where theoretical constraints are violated.
 
