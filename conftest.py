@@ -4,6 +4,10 @@ import builtins
 from doctest import ELLIPSIS, NORMALIZE_WHITESPACE
 from typing import Any
 
+import matplotlib
+
+matplotlib.use("Agg")  # Use non-interactive backend for testing
+
 import jax
 import numpy as np
 import pytest
