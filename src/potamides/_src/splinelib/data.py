@@ -4,7 +4,7 @@
 __all__ = (
     "make_gamma_from_data",
     "make_increasing_gamma_from_data",
-    "point_to_point_arclenth",
+    "point_to_point_arclength",
     "point_to_point_distance",
 )
 
@@ -42,7 +42,7 @@ def point_to_point_distance(data: SzData2, /) -> SzGamma:
     return d_p2p
 
 
-def point_to_point_arclenth(data: SzData2, /) -> SzGamma:
+def point_to_point_arclength(data: SzData2, /) -> SzGamma:
     """Return a P2P approximation of the arc-length.
 
     The data should be sorted, otherwise this doesn't make a lot of sense.
@@ -52,7 +52,7 @@ def point_to_point_arclenth(data: SzData2, /) -> SzGamma:
     >>> import jax.numpy as jnp
 
     >>> data = jnp.array([[0, 0], [1, 0], [1, 2], [0, 2]])
-    >>> point_to_point_arclenth(data)
+    >>> point_to_point_arclength(data)
     Array([1., 3., 4.], dtype=float64)
 
     """
@@ -60,14 +60,16 @@ def point_to_point_arclenth(data: SzData2, /) -> SzGamma:
 
 
 def make_gamma_from_data(data: SzData2, /) -> SzGamma:
-    r"""Return $\gamma$, the normalized arc-length of the data.
+    r"""Return :math:`\gamma`, the normalized arc-length of the data.
 
-    $$ \gamma = 2\frac{s}{L} - 1 , \in [-1, 1] $$
+    .. math::
 
-    where $s$ is the arc-length at $\gamma$ and $L$ is the total arc-length.
+        \gamma = 2\frac{s}{L} - 1 , \in [-1, 1]
+
+    where :math:`s` is the arc-length at :math:`\gamma` and :math:`L` is the total arc-length.
 
     Gamma is constructed approximately using a point-to-point approximation (the
-    function `point_to_point_arclenth`).
+    function `point_to_point_arclength`).
 
     Notes
     -----
@@ -86,7 +88,7 @@ def make_gamma_from_data(data: SzData2, /) -> SzGamma:
     Array([-1.        ,  0.33333333,  1.        ], dtype=float64)
 
     """
-    s = point_to_point_arclenth(data)  # running arc-length
+    s = point_to_point_arclength(data)  # running arc-length
     s_min = s.min()
     gamma = 2 * (s - s_min) / (s.max() - s_min) - 1  # normalize to range
     return gamma
@@ -112,12 +114,14 @@ def _find_plateau_mask(arr: SzN, /) -> SzN:
 def make_increasing_gamma_from_data(data: SzData2, /) -> tuple[SzGamma, SzGamma2]:
     r"""Return the trimmed data and gamma, the normalized arc-length.
 
-    $$ \gamma = 2\frac{s}{L} - 1 , \in [-1, 1] $$
+    .. math::
 
-    where $s$ is the arc-length at $\gamma$ and $L$ is the total arc-length.
+        \gamma = 2\frac{s}{L} - 1 , \in [-1, 1]
+
+    where :math:`s` is the arc-length at :math:`\gamma` and :math:`L` is the total arc-length.
 
     Gamma is constructed approximately using a point-to-point (P2P)
-    approximation (the function `point_to_point_arclenth`). Using the P2P
+    approximation (the function `point_to_point_arclength`). Using the P2P
     arc-length is not guaranteed to be monotonically *increasing* since adjacent
     data points can have 0 distance. This function then trims the data such that
     gamma is monotonically increasing, keeping the first point of any plateau.

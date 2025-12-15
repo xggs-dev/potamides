@@ -59,7 +59,7 @@ def reduce_point_density(
     Real[Array, "{num_splits + 2}"],  # gamma
     Real[Array, "{num_splits + 2} 2"],  # data
 ]:
-    """Split and reduce gamma, data into `num_split` blocks, keeping ends.
+    """Split and reduce gamma, data into `num_splits` blocks, keeping ends.
 
     A dataset representing the points along a stream's track can have
     problematic small changes in curvature. If we reduce the number of points
@@ -149,12 +149,12 @@ def data_distance_cost_fn(
 ) -> Sz0:
     r"""Cost function to minimize that compares data to spline fit.
 
-    $$
-    \text{cost} = \sum_i \left( \frac{y_i - f(\gamma_i)}{\sigma_i} \right)^2
-    $$
+    .. math::
 
-    where $y_i$ is the target data, $f(\gamma_i)$ is the spline evaluated at
-    $\gamma_i$, and $\sigma_i$ is the uncertainty on $y_i$.
+        \text{cost} = \sum_i \left( \frac{y_i - f(\gamma_i)}{\sigma_i} \right)^2
+
+    where :math:`y_i` is the target data, :math:`f(\gamma_i)` is the spline evaluated at
+    :math:`\gamma_i`, and :math:`\sigma_i` is the uncertainty on :math:`y_i`.
 
     Parameters
     ----------
@@ -173,7 +173,7 @@ def data_distance_cost_fn(
         The uncertainty on each datum in `data_y`.
 
     """
-    # Compute the cost of the distance from the spline from the data
+    # Compute the cost of the distance from the spline to the data
     spl = interpax.Interpolator1D(gamma, knots, method="cubic2")
     data_cost = jnp.sum(((data_y - spl(data_gamma)) / sigmas) ** 2)
     return data_cost / data_gamma.shape[0]
@@ -210,15 +210,16 @@ def concavity_change_cost_fn(
     r"""Cost function to penalize changes in signed curvature for 2D curves.
 
     The integrand of the cost function is the derivative of the arctangent of
-    the signed curvature multiplied by a large number $\lambda$.
+    the signed curvature multiplied by a large number :math:`\lambda`.
 
     .. math::
+
         \left( \frac{d}{ds} \atan\left(\lambda \kappa_{\text{signed}}(s)\right)
         \right)^2
 
-    where $\kappa_{\text{signed}}(s)$ is the signed curvature at $s$ and
-    $\lambda$ is a large number that controls the width of the smoothing. The
-    $\atan$ function differentiably mimics the undifferentiable $\text{sign}$
+    where :math:`\kappa_{\text{signed}}(s)` is the signed curvature at :math:`s` and
+    :math:`\lambda` is a large number that controls the width of the smoothing. The
+    :math:`\atan` function differentiably mimics the non-differentiable :math:`\text{sign}`
     function. The cost is the integral over the arc-length.
 
     Parameters

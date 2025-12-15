@@ -111,11 +111,11 @@ def test_arc_length_p2p_consistency(
 
 
 @pytest.mark.array_compare
-def test_arc_length_quadtrature_consistency(
+def test_arc_length_quadrature_consistency(
     spline: interpax.Interpolator1D, gamma: SzGamma
 ) -> SzGamma:
     r"""Test that the arc length from start to end of the spline is consistent."""
-    out = jax.vmap(splib.arc_length_quadtrature, (None, 0))(spline, gamma)
+    out = jax.vmap(splib.arc_length_quadrature, (None, 0))(spline, gamma)
     assert out.shape == gamma.shape
     return out
 
@@ -244,11 +244,11 @@ def test_arc_length_p2p_correctness(scaled_spline: interpax.Interpolator1D) -> N
 
 
 @pytest.mark.parametrize("scaled_spline", [2.0], indirect=True)
-def test_arc_length_quadtrature_correctness(
+def test_arc_length_quadrature_correctness(
     scaled_spline: interpax.Interpolator1D,
 ) -> None:
     """Test `arc_length_quadrature` for correctness."""
-    got = splib.arc_length_quadtrature(scaled_spline, 0, 2 * jnp.pi) / jnp.pi
+    got = splib.arc_length_quadrature(scaled_spline, 0, 2 * jnp.pi) / jnp.pi
     exp = 4
     assert jnp.allclose(got, exp)
 
