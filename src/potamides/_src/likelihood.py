@@ -23,13 +23,13 @@ def compute_ln_lik_curved(
 
     Parameters
     ----------
-    ngamma
+    ngamma : int
         Number of gamma values.
-    f1_logf1
+    f1_logf1 : Array[float, ()]
         Log-likelihood contribution from the first feature.
-    f2_logf2
+    f2_logf2 : Array[float, ()]
         Log-likelihood contribution from the second feature.
-    f3_logf3
+    f3_logf3 : Array[float, ()]
         Log-likelihood contribution from the third feature.
 
     Returns
@@ -112,11 +112,11 @@ def compute_ln_likelihood(
         Unit acceleration vectors in the x-y plane at N positions. These
         represent the direction of the gravitational acceleration from the
         potential model.
-    where_straight : Array[bool, (N,)]
+    where_straight : Array[bool, (N,)], optional
         Boolean mask indicating positions where the stream is locally straight
         (has negligible curvature). If `None` (default), all positions are
         assumed to be curved.
-    sigma_theta : float
+    sigma_theta : float, optional
         Standard deviation of the angle distribution between acceleration and
         curvature vectors for straight segments, given in radians. Only used
         when `where_straight` contains `True` values. Default is 10 degrees in
@@ -276,8 +276,8 @@ def combine_ln_likelihoods(
 
         \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
 
-    where $n_i$ is the number of gamma points, $L_i$ is the arc-length, and
-    $\mathcal{L}_i$ is the log-likelihood for segment $i$.
+    where :math:`n_i` is the number of gamma points, :math:`L_i` is the arc-length, and
+    :math:`\mathcal{L}_i` is the log-likelihood for segment :math:`i`.
 
     Examples
     --------
