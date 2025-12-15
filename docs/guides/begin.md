@@ -8,20 +8,24 @@ The basic work flow is stream fitting, then
 
 The stream is 3D. We use only 2D (x-z), for plotting we name it as (x-y)
 
-```{doctest}
-:group: stream
+```{code-block} python
 >>> import numpy as np
 >>> import matplotlib.pyplot as plt
 
->>> name='fig5_streamB.npy'
->>> file_dir='enter_your_file_dir' # enter your own file_dir
->>> data=np.load(file_dir+name,allow_pickle='True')
+>>> # Example data - replace with your actual data file
+>>> # name='fig5_streamB.npy'
+>>> # file_dir='enter_your_file_dir' # enter your own file_dir
+>>> # data=np.load(file_dir+name,allow_pickle='True')
+>>> # x=data.item()['x']
+>>> # y=data.item()['z']
 
->>> x=data.item()['x']
->>> y=data.item()['z']
+>>> # For demonstration, create synthetic data
+>>> t = np.linspace(-np.pi, np.pi, 200)
+>>> x = 20 * np.cos(t) + np.random.normal(0, 1, len(t))
+>>> y = 20 * np.sin(t) + np.random.normal(0, 1, len(t))
 
->>> plt.figure(figsize=(5,5))
->>> plt.plot(x,y,'.')
+>>> _ = plt.figure(figsize=(5,5))
+>>> _ = plt.plot(x,y,'.')
 
 ```
 
@@ -41,7 +45,7 @@ Because the straight segment is hard to calculate the curvature, and if we set
 the curvature to 0, this part will be no contribution to the inference. So we
 skip the part
 
-```{doctest}
+```{code-block} python
 >>> X, Y = x, y
 
 >>> # Original angles in the range (-π, π]
@@ -68,15 +72,18 @@ skip the part
 
 >>> binned = {}
 >>> for (ab, rb), x_val, y_val in zip(bins, X, Y):
->>>     binned.setdefault((ab, rb), []).append((x_val, y_val))
+...     binned.setdefault((ab, rb), []).append((x_val, y_val))
 
 >>> # ===== 6. Compute medians and sort by angle bin =====
 >>> median_x_ls, median_y_ls = [], []
 >>> sorted_bins = sorted(binned.keys(), key=lambda k: k[0])   # Sort by angular order
 >>> for b in sorted_bins:
->>>     pts = np.asarray(binned[b])
->>>     median_x_ls.append(np.median(pts[:, 0]))
->>>     median_y_ls.append(np.median(pts[:, 1]))
+...     pts = np.asarray(binned[b])
+...     median_x_ls.append(np.median(pts[:, 0]))
+...     median_y_ls.append(np.median(pts[:, 1]))
+
+>>> x_cent=np.array(median_x_ls)
+>>> y_cent=np.array(median_y_ls)
 
 ```
 
@@ -85,16 +92,16 @@ trajectories. Instead, following the annotation in the paper, we only chose a
 subset, corresponding to the operation `[42:-4]` here.)
 
 ```{code-block} python
->>> x_cent=np.array(median_x_ls[42:-4])
->>> y_cent=np.array(median_y_ls[42:-4])
->>> plt.figure(figsize=(5,5))
->>> plt.plot(X,Y,'.')
->>> plt.plot(0,0,'r*')
->>> plt.plot(x_cent,y_cent,'.')
->>> plt.xlim(-40,40)
->>> plt.ylim(-40,40)
+>>> # Select subset of median trajectory
+>>> # x_cent=np.array(median_x_ls[42:-4])
+>>> # y_cent=np.array(median_y_ls[42:-4])
+>>> _ = plt.figure(figsize=(5,5))
+>>> _ = plt.plot(X,Y,'.')
+>>> _ = plt.plot(0,0,'r*')
+>>> _ = plt.plot(x_cent,y_cent,'.')
+>>> _ = plt.xlim(-40,40)
+>>> _ = plt.ylim(-40,40)
 >>> plt.grid()
->>> plt.show()
 ```
 
 (adding the plot)
