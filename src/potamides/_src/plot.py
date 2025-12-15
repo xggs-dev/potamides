@@ -40,8 +40,8 @@ def get_angles(acc_xy_unit: SzN2, kappa_hat: SzN2) -> SzN:
         re-normalize them to ensure unit length.
     kappa_hat : Array[float, (N, 2)]
         The unit curvature vector (or named normal vector) at each position.
-        This is perpendicular to the stream direction. Also re-normalized
-        to ensure unit length.
+        This is perpendicular to the stream direction. Also re-normalized to
+        ensure unit length.
 
     Returns
     -------
@@ -56,10 +56,10 @@ def get_angles(acc_xy_unit: SzN2, kappa_hat: SzN2) -> SzN:
     product and dot product of the input vectors:
 
     .. math::
+
         \theta = \arctan2(\vec{a} \times \hat{\kappa}, \vec{a} \cdot \hat{\kappa})
 
-    where :math:`\vec{a}` is the acceleration and :math:`\hat{\kappa}` is the
-    normal vector.
+    where :math:`\vec{a}` is the acceleration and :math:`\hat{\kappa}` is the normal vector.
 
     Examples
     --------
@@ -138,9 +138,9 @@ def plot_theta_of_gamma(
     r"""Plot angles θ as a function of stream parameter gamma with parameter colormap.
 
     Create a scatter plot showing how the angle between acceleration and normal
-    vectors varies along the stream (:math:`\gamma`) for different parameter values. This
-    visualization is crucial for understanding stream dynamics and identifying
-    regions where theoretical constraints are violated.
+    vectors varies along the stream (:math:`\gamma`) for different parameter values.
+    This visualization is crucial for understanding stream dynamics and
+    identifying regions where theoretical constraints are violated.
 
     Parameters
     ----------
@@ -155,10 +155,11 @@ def plot_theta_of_gamma(
         Shape (n_params, n_gamma) where angles[i, j] is the angle for
         param[i] at gamma[j].
     mle_idx : int, optional
-        Index of the maximum likelihood estimate in the param array.
-        If provided, this parameter's angles will be highlighted in red.
-    param_label : str, default r"$q$"
+        Index of the maximum likelihood estimate in the param array.  If not
+        `None` (default), this parameter's angles will be highlighted in red.
+    param_label : str, optional
         Label for the colorbar showing the parameter values. Supports LaTeX.
+        Default is r"$q$"
 
     Returns
     -------
@@ -335,18 +336,21 @@ def plot_acceleration_field(
         (typically kpc for galactic potentials).
     ylim : tuple[float, float]
         The y-axis limits for the plot in the same units as the potential.
-    grid_size : int, default 20
+    grid_size : int, optional
         Number of grid points along each axis. Total number of vectors
-        plotted will be grid_size².
+        plotted will be grid_size². Default is 20.
     ax : matplotlib.axes.Axes, optional
         Existing axes to plot on. If None, creates new figure and axes
         with high DPI and large size.
-    vec_width : float, default 0.003
+    vec_width : float, optional
         Width of the quiver arrows. Smaller values create thinner arrows.
-    vec_scale : float, default 30
+        Default is 0.003.
+    vec_scale : float, optional
         Scale factor for arrow length. Larger values create shorter arrows.
-    color : str, default "#808F80"
+        Default is 30.
+    color : str, optional
         Color for the acceleration vectors. Can be any matplotlib color.
+        Default is "#808F80".
 
     Returns
     -------
