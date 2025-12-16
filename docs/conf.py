@@ -17,7 +17,19 @@ sys.path.insert(0, str((here.parent / "src").resolve()))
 project: Final[str] = "potamides"
 copyright: Final[str] = "2025, Sirui"
 author: Final[str] = "Sirui"
-version = release = importlib.metadata.version("potamides")
+
+# Try to get version from package metadata, fallback to importing the module
+try:
+    version = release = importlib.metadata.version("potamides")
+except importlib.metadata.PackageNotFoundError:
+    # If package not installed, try to import and get version
+    try:
+        import potamides as ptd
+
+        version = release = ptd.__version__
+    except (ImportError, AttributeError):
+        # If all else fails, use a placeholder
+        version = release = "unknown"
 
 extensions: Final[list[str]] = [
     "myst_nb",
@@ -69,6 +81,9 @@ myst_enable_extensions = [
     "attrs_block",
 ]
 
+# Enable MyST parsing in docstrings
+myst_update_mathjax: Final = True
+
 myst_directives: Final[dict[str, str]] = {
     "plot": "matplotlib.sphinxext.plot_directive.plot_directive",
 }
@@ -114,6 +129,12 @@ import numpy as np
 
 always_document_param_types: Final = True
 
+# Configure Napoleon to preserve math syntax
+napoleon_use_math: Final = True
+napoleon_custom_sections: Final = None
+
+# Ensure autodoc processes docstrings as CommonMark/MyST
+autodoc_docstring_signature: Final = True
 
 # Tuples: "(N,)", "(N, 2)", "(n1, n2, n3)", "(..., 2)", etc.
 _SHAPE_TUPLE_RE: Final[str] = (
@@ -218,7 +239,53 @@ class AutoLinkBareWordsInTerms(SphinxTransform):
             text_node.parent.replace(text_node, out)
 
 
+def _process_docstring_math(
+    _app,
+    _what,
+    _name,
+    _obj,
+    _options,
+    lines,
+):
+    """Convert $$ and $ syntax to RST math directives in docstrings."""
+
+    result = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        # Check for block math ($$)
+        if line.strip() == "$$":
+            # Start of block math
+            result.append("")
+            result.append(".. math::")
+            result.append("")
+            i += 1
+
+            # Collect math content until closing $$
+            while i < len(lines) and lines[i].strip() != "$$":
+                # Add proper indentation for math content
+                if lines[i].strip():
+                    result.append("    " + lines[i])
+                else:
+                    result.append("")
+                i += 1
+
+            # Skip closing $$
+            i += 1
+            result.append("")
+        else:
+            # Convert inline math $...$ to :math:`...`
+            converted_line = re.sub(r"\$([^\$]+)\$", r":math:`\1`", line)
+            result.append(converted_line)
+            i += 1
+
+    lines[:] = result
+
+
 def setup(app):
     app.add_transform(AutoLinkBareWordsInTerms)
+    # Convert $$ and $ in docstrings to RST math directives
+    app.connect("autodoc-process-docstring", _process_docstring_math)
     # app.connect("missing-reference", _shape_missing_ref)
     return {"parallel_read_safe": True, "parallel_write_safe": True}
