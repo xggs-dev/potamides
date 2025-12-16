@@ -55,11 +55,11 @@ def get_angles(acc_xy_unit: SzN2, kappa_hat: SzN2) -> SzN:
     The angle is computed using :func:`jax.numpy.atan2` applied to the cross
     product and dot product of the input vectors:
 
-    .. math::
+    $$
+    \theta = \arctan2(\vec{a} \times \hat{\kappa}, \vec{a} \cdot \hat{\kappa})
+    $$
 
-        \theta = \arctan2(\vec{a} \times \hat{\kappa}, \vec{a} \cdot \hat{\kappa})
-
-    where :math:`\vec{a}` is the acceleration and :math:`\hat{\kappa}` is the normal vector.
+    where $\vec{a}$ is the acceleration and $\hat{\kappa}$ is the normal vector.
 
     Examples
     --------
@@ -138,7 +138,7 @@ def plot_theta_of_gamma(
     r"""Plot angles θ as a function of stream parameter gamma with parameter colormap.
 
     Create a scatter plot showing how the angle between acceleration and normal
-    vectors varies along the stream (:math:`\gamma`) for different parameter values.
+    vectors varies along the stream ($\gamma$) for different parameter values.
     This visualization is crucial for understanding stream dynamics and
     identifying regions where theoretical constraints are violated.
 

@@ -37,7 +37,7 @@ In this step, we providing solution that doing a **median trajectory** for the
 stream. As mentioned in the paper (?), our code
 
 From the plot, we can see that the stream exhibits a long, gradually narrowing
-tail (?) extending towards the right, while the left side shos a distinct
+tail (?) extending towards the right, while the left side shows a distinct
 U-shaped structure. At the U-shaped region, the stream undergoes a pronounced
 turn, with stars appearing more densely concentrated in this section.
 
