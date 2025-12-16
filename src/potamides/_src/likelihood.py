@@ -267,17 +267,17 @@ def combine_ln_likelihoods(
     The weighting scheme computes the mean measurement density across all
     segments and uses this to normalize individual segment contributions:
 
-    .. math::
+    $$
+    \bar{\rho} = \frac{\sum_i n_i}{\sum_i L_i}
 
-        \bar{\rho} = \frac{\sum_i n_i}{\sum_i L_i}
+    w_i = \frac{\bar{\rho}}{\rho_i} = \frac{\bar{\rho} L_i}{n_i}
 
-        w_i = \frac{\bar{\rho}}{\rho_i} = \frac{\bar{\rho} L_i}{n_i}
+    \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
+    $$
 
-        \mathcal{L}_{combined} = \sum_i w_i \mathcal{L}_i
-
-    where :math:`n_i` is the number of gamma points, :math:`L_i` is the
-    arc-length, and :math:`\mathcal{L}_i` is the log-likelihood for
-    segment :math:`i`.
+    where $n_i$ is the number of gamma points, $L_i$ is the
+    arc-length, and $\mathcal{L}_i$ is the log-likelihood for
+    segment $i$.
 
     Examples
     --------
