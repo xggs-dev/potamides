@@ -56,7 +56,7 @@ parsers = [
     myst.SkipParser(),
 ]
 
-docs = Sybil(parsers=parsers, patterns=["*.md"], excludes=["**/2D-inference.md"])
+docs = Sybil(parsers=parsers, patterns=["*.md"])
 python = Sybil(  # TODO: get working with myst parsers
     parsers=[
         rest.DocTestParser(optionflags=optionflags),
