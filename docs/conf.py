@@ -84,6 +84,13 @@ myst_enable_extensions = [
 # Enable MyST parsing in docstrings
 myst_update_mathjax: Final = True
 
+# MyST-NB configuration for executing notebooks
+nb_execution_mode: Final = "cache"  # "off", "auto", "cache", or "force"
+nb_execution_timeout: Final = 180  # seconds
+nb_execution_allow_errors: Final = False
+nb_execution_raise_on_error: Final = True
+nb_execution_show_tb: Final = True
+
 myst_directives: Final[dict[str, str]] = {
     "plot": "matplotlib.sphinxext.plot_directive.plot_directive",
 }
