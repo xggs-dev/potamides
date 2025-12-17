@@ -103,8 +103,8 @@ pip install -e .  # editable mode
 ## Quickstart
 
 This quick example demonstrates the basic workflow for fitting a stellar stream
-with a gravitational potential model. We'll use StreamA data from Figure 5
-(first panel) of [Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) to
+with a gravitational potential model. We'll use StreamB data from Figure 5
+(second panel) of [Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) to
 illustrate the method.
 
 ### Workflow Overview
@@ -144,12 +144,12 @@ from potamides import splinelib
 ### Step 1: Prepare Stream Data
 
 Load or define your stream coordinates. Here we use control points manually
-extracted from StreamA in
-[Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) (Figure 5, first
+extracted from StreamB in
+[Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) (Figure 5, second
 panel):
 
 ```{code-cell} ipython3
-# Example: manually extracted from Nibauer et al. (2023), Figure 5, first panel
+# Example: manually extracted from Nibauer et al. (2023), Figure 5, second panel
 xy = np.array([
     [-1.02940125e-02, -1.09604831e+01],
     [-9.90913652e+00, -8.79524192e+00],
@@ -275,8 +275,8 @@ print("✓ Likelihood functions defined and JIT compiled")
 
 ### Step 4: Sample Parameter Space
 
-**About the mock stream**: StreamA was generated with a gravitational potential
-having **q2 = 0.8** and **phi = 0**. Our goal is to recover these parameters
+**About the mock stream**: StreamB was generated with a gravitational potential
+having **q2 = 1.0** and **phi = 0**. Our goal is to recover these parameters
 from the stream's curvature.
 
 **1D inference example**: In this demonstration, we perform a simplified
@@ -340,7 +340,7 @@ lnlik_sorted = lnlik_seg_np[idx]
 fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
 plt.plot(q_sorted, np.exp(lnlik_sorted - lnlik_sorted.max()),
          'c-', linewidth=2, label='Relative likelihood')
-plt.vlines(0.8,0,1.1,'r', label='True value (q2=0.8)')
+plt.vlines(1.0,0,1.1,'r', label='True value (q2=1.0)')
 plt.xlim(0.0, 2.0)
 plt.ylim(0.0, 1.05)
 plt.xlabel(r"$q_2$ (y-axis flattening)", fontsize=14)
