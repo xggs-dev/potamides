@@ -103,9 +103,22 @@ pip install -e .  # editable mode
 ## Quickstart
 
 This quick example demonstrates the basic workflow for fitting a stellar stream
-with a gravitational potential model. We'll use data from
-[Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) to illustrate the
-method.
+with a gravitational potential model. We'll use StreamA data from Figure 5
+(first panel) of [Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) to
+illustrate the method.
+
+### Workflow Overview
+
+The analysis consists of five main steps:
+
+1. **Prepare control points** - Get ordered (x, y) coordinates of the stream
+   (user-provided data)
+2. **Create spline track** - Fit a parametric spline representation to the
+   control points
+3. **Define potential model** - Set up the trial halo potential parameters
+4. **Sample parameter space** - Compute the likelihood for parameter samples
+5. **Visualize results** - Plot the likelihood distribution and best-fit
+   parameters
 
 For a complete interactive tutorial, see the
 [Stream Fitting Guide](guides/stream_fitting.md).
@@ -130,11 +143,13 @@ from potamides import splinelib
 
 ### Step 1: Prepare Stream Data
 
-Load or define your stream coordinates. Here we use control points extracted
-from the literature:
+Load or define your stream coordinates. Here we use control points manually
+extracted from StreamA in
+[Nibauer et al. (2023)](https://arxiv.org/abs/2303.17406) (Figure 5, first
+panel):
 
 ```{code-cell} ipython3
-# Example: manually extracted from Nibauer et al. (2023), Figure 5
+# Example: manually extracted from Nibauer et al. (2023), Figure 5, first panel
 xy = np.array([
     [-1.02940125e-02, -1.09604831e+01],
     [-9.90913652e+00, -8.79524192e+00],
@@ -152,7 +167,13 @@ print(f"Stream contains {len(xy)} control points")
 
 ### Step 2: Create Spline Track
 
-Parameterize the stream using arc-length and construct a `Track` object:
+Parameterize the stream using arc-length and construct a `Track` object.
+
+Note: In this example, we directly use the control points to construct the
+spline without further optimization, as the reference points have already been
+carefully selected. For automatic knot optimization, see
+`splinelib.optimize_spline_knots` and related functions discussed in the
+[Stream Fitting Guide](guides/stream_fitting.md).
 
 ```{code-cell} ipython3
 def make_gamma_from_data(data):
@@ -175,8 +196,6 @@ Visualize the track:
 ```{code-cell} ipython3
 fig, ax = plt.subplots(figsize=(5, 5), dpi=150)
 plt.plot(0, 0, 'r*', markersize=12, label='Galactic center')
-plt.plot(track.knots[:, 0], track.knots[:, 1], 'o',
-         color='orange', markersize=6, label='Knots')
 plot_sparse_gamma = jnp.linspace(-1, 1, num=30)
 track.plot_all(plot_sparse_gamma, ax=ax, show_tangents=False)
 ax.set_xlabel("X (kpc)")
@@ -192,7 +211,18 @@ plt.show()
 
 ### Step 3: Define Potential Model
 
-Set up a triaxial NFW halo potential with parameters:
+Set up a triaxial NFW halo potential with parameters.
+
+**Important notes on configuration**:
+
+- The parameters shown below are **default values for illustration** — in
+  practice, you'll fit some of these (like q2, phi, origin) while keeping others
+  fixed
+- **Galactic center**: The default assumes the halo is centered at **(0,
+  0, 0)**. If your stream data uses a different coordinate system or the halo is
+  off-center, adjust `origin_x`, `origin_y`, `origin_z` accordingly
+- **Disk component**: Set `withdisk=False` (default) to use halo-only potential.
+  Set to `True` to include a Miyamoto-Nagai disk with mass `Mdisk`
 
 ```{code-cell} ipython3
 params_defaults = {
@@ -205,13 +235,13 @@ params_defaults = {
     "q3": 1.0,
     # Halo orientation
     "phi": 0.0,  # ← long-axis orientation angle
-    # Halo center position
+    # Halo center position (default: galactic center)
     "origin_x": 0, "origin_y": 0, "origin_z": 0,
     # Additional components
     "Mdisk": 5e12,
     "rot_z": 0.0, "rot_x": 0.0,
 }
-params_statics = {"withdisk": False}
+params_statics = {"withdisk": False}  # Halo-only potential (default)
 
 @jax.jit
 def compute_acc_hat(params, pos2d):
@@ -245,7 +275,32 @@ print("✓ Likelihood functions defined and JIT compiled")
 
 ### Step 4: Sample Parameter Space
 
-Scan the q2 parameter (y-axis flattening) to find the best fit:
+**About the mock stream**: StreamA was generated with a gravitational potential
+having **q2 = 0.8** and **phi = 0**. Our goal is to recover these parameters
+from the stream's curvature.
+
+**1D inference example**: In this demonstration, we perform a simplified
+1-parameter fit by scanning only q2 while keeping all other parameters fixed.
+This illustrates the basic method before moving to multi-parameter fitting (see
+[Guides](guides/2D-inference.md)).
+
+**Understanding q2** (following
+[Nibauer et al. 2023](https://arxiv.org/abs/2303.17406) convention):
+
+- **q2 = 1**: Spherical halo in the y-direction
+- **q2 < 1**: Flattened (oblate) halo, where the y-axis is the short axis
+- **q2 > 1**: Prolate (elongated) halo, where the y-axis is stretched
+
+**Parameter range**: We scan q2 ∈ [0.1, 2.0] to reproduce the original Figure 5
+from the paper. **Note: In later stream curvature studies, q2 is often redefined
+as the short-to-long axis ratio, which restricts values to (0, 1].**
+
+**Commonly fitted parameters in stream analysis**:
+
+- **q1, q2, q3**: Halo axis ratios → constrains dark matter halo shape
+- **phi**: Long-axis orientation → determines halo alignment
+- **origin_x, origin_y, origin_z**: Halo center position → critical for
+  off-center streams
 
 ```{code-cell} ipython3
 ranges = {"q2": (0.1, 2.0)}
@@ -272,7 +327,8 @@ print(f"Log-likelihood range: [{jnp.min(lnlik_seg):.3f}, {jnp.max(lnlik_seg):.3f
 
 ### Step 5: Visualize Results
 
-Plot the relative likelihood as a function of q2:
+Plot the relative likelihood as a function of q2 and compare with the true
+value:
 
 ```{code-cell} ipython3
 q = np.array(params['q2'])
@@ -284,6 +340,7 @@ lnlik_sorted = lnlik_seg_np[idx]
 fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
 plt.plot(q_sorted, np.exp(lnlik_sorted - lnlik_sorted.max()),
          'c-', linewidth=2, label='Relative likelihood')
+plt.vlines(0.8,0,1.1,'r', label='True value (q2=0.8)')
 plt.xlim(0.0, 2.0)
 plt.ylim(0.0, 1.05)
 plt.xlabel(r"$q_2$ (y-axis flattening)", fontsize=14)
@@ -303,17 +360,13 @@ plt.show()
 # Find best-fit parameter
 idx_max = np.argmax(lnlik_sorted)
 q_best = q_sorted[idx_max]
-print(f"\nBest-fit q2 = {q_best:.3f}")
+
+
 ```
 
 ### Next Steps
 
 This quickstart covered single-parameter fitting. For more advanced analyses:
-
-- **Multi-parameter fitting**: Scan q1, q2, q3, phi, and origin simultaneously
-- **Bayesian inference**: Use MCMC (numpyro, emcee) for full posterior
-  distributions
-- **Real data**: Apply to observed streams from Gaia or other surveys
 
 See the [Guides](guides/begin.md) for detailed tutorials and the
 [API Reference](api/index.md) for complete documentation.
@@ -324,8 +377,8 @@ If you use this software in your research, please cite it as:
 
 ```bibtex
 @software{potamides2024,
-  author = {Nibauer, Jacob and Starkman, Nathaniel and Wu, Sirui},
-  title = {potamides: Constraining gravitational potentials with stellar stream curvature},
+  author = {Wu, Sirui and Starkman, Nathaniel and Nibauer, Jacob and Pearson, Sarah},
+  title = {Potamides: A Python package for stream curvature analysis},
   year = {2024},
   url = {https://github.com/xggs-dev/potamides}
 }
