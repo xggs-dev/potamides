@@ -16,9 +16,7 @@ kernelspec:
 :hidden:
 :caption: Guides
 
-guides/begin.md
 guides/stream_fitting.md
-guides/1D-inference.md
 guides/2D-inference.md
 ```
 
