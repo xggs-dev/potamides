@@ -183,7 +183,7 @@ def make_gamma_from_data(data):
 gamma = make_gamma_from_data(xy)
 track = ptd.Track(gamma, xy)
 
-print(f"Track created with {len(gamma)} points")
+print(f"Track created with {len(gamma)} knots")
 print(f"Gamma range: [{gamma.min():.3f}, {gamma.max():.3f}]")
 ```
 
@@ -214,8 +214,8 @@ Set up a triaxial NFW halo potential with parameters.
 - The parameters shown below are **default values for illustration** — in
   practice, you'll fit some of these (like q2, phi, origin) while keeping others
   fixed
-- **Galactic center**: The default assumes the halo is centered at **(0,
-  0, 0)**. If your stream data uses a different coordinate system or the halo is
+- **Galactic center**: The default assumes the halo is centered at `(0, 0, 0)`.
+  If your stream data uses a different coordinate system or the halo is
   off-center, adjust `origin_x`, `origin_y`, `origin_z` accordingly
 - **Disk component**: Set `withdisk=False` (default) to use halo-only potential.
   Set to `True` to include a Miyamoto-Nagai disk with mass `Mdisk`
@@ -356,7 +356,6 @@ plt.show()
 # Find best-fit parameter
 idx_max = np.argmax(lnlik_sorted)
 q_best = q_sorted[idx_max]
-
 
 ```
 

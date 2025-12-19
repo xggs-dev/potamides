@@ -151,7 +151,7 @@ def compute_ln_likelihood_scalar(params, pos2d, unit_curvature, where_straight=N
     lnlik = ptd.compute_ln_likelihood(
         unit_curvature, unit_acc_xy, where_straight=where_straight
     )
-    return lnlik - jnp.log(len(unit_curvature))
+    return lnlik
 
 compute_ln_likelihood = jax.vmap(
     compute_ln_likelihood_scalar, in_axes=(0, None, None, None)
