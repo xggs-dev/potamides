@@ -364,8 +364,12 @@ q_best = q_sorted[idx_max]
 
 This quickstart covered single-parameter fitting. For more advanced analyses:
 
-See the [Guides](guides/begin.md) for detailed tutorials and the
-[API Reference](api/index.md) for complete documentation.
+- [Stream Fitting Guide](guides/stream_fitting.md) - Learn three approaches to
+  building Track objects
+- [2D Inference Guide](guides/2D-inference.md) - Advanced parameter fitting
+  techniques
+- [API Reference](api/index.md) - Complete documentation of all functions and
+  classes
 
 ## Citation
 

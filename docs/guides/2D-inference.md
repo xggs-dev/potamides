@@ -258,8 +258,27 @@ plt.show()
 
 ## Interpretation
 
-**Todo**
+The purple shaded region in the contour plot represents the 95% credible region
+where the model parameters are consistent with the observed stream curvature.
 
-```
+**Key characteristics of this likelihood function**:
 
-```
+- **Step-like behavior**: The likelihood function is relatively flat within the
+  credible region, meaning all parameter combinations in the purple area are
+  nearly equally probable
+- **Exclusion-based inference**: Rather than pinpointing a unique best-fit
+  solution, this method is most effective at **ruling out incompatible parameter
+  space**
+  - Parameters outside the purple region produce stream curvatures inconsistent
+    with the data
+  - Parameters inside the purple region are all compatible with observations
+
+**Physical interpretation**:
+
+- The extended credible region reflects inherent degeneracies between halo
+  flattening (q₂) and orientation (φ)
+- Multiple (q₂, φ) combinations can produce similar stream curvatures, making it
+  difficult to distinguish them based on curvature alone
+- Additional constraints (e.g., proper motions, radial velocities, or multiple
+  streams) are needed to break these degeneracies and narrow down the parameter
+  space further
