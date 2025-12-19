@@ -235,6 +235,7 @@ corner.hist2d(
     ax=ax,
     color="purple",
     plot_density=True,
+    contourf_kwargs={"cmap": "Purples", "vmin": 0, "vmax": 1},
     **hist2d_kw,
 )
 

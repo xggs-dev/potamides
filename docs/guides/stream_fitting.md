@@ -199,7 +199,7 @@ xy_for_track = jnp.column_stack([X_new, Y_new])
 # This uses the same function as in Method 1, treating the dense points as data
 gamma_track = make_gamma_from_data(xy_for_track)
 
-# Step 3: Create the Track object
+# Step 2: Create the Track object
 track_2 = ptd.Track(gamma_track, xy_for_track)
 
 print(f"Track created successfully with {len(gamma_track)} points")
@@ -383,7 +383,7 @@ def make_optimal_track(
         cost_args=(ref_gamma, ref_points),
         cost_kwargs=ImmutableMap(cost_kwargs),
     )
-    # Create a spline from the optimized knots. However, gamma is wrong!
+    # Create a spline from the optimized knots.
     spline = interpax.Interpolator1D(fid_gamma, knots, method="cubic2")
 
     # Create a new gamma, proportional to the arc-length from the spline.
