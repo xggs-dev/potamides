@@ -8,18 +8,18 @@ authors:
   - name: Sirui Wu
     orcid: 0009-0003-4675-3622
     equal-contrib: true
-    affiliation: 1 # (Multiple affiliations must be quoted)
+    affiliation: 1
   - name: Nathaniel Starkman
     orcid: 0000-0003-3954-3291
-    equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+    equal-contrib: true
     affiliation: 2
-  - name: Jake Nibauer
+  - name: Jacob Nibauer
     orcid: 0000-0001-8042-5794
-    corresponding: true # (This is how to denote the corresponding author)
+    corresponding: true
     affiliation: 3
   - name: Sarah Pearson
     orcid: 0000-0003-0256-5446
-    corresponding: true # (This is how to denote the corresponding author)
+    corresponding: true
     affiliation: 1
 
 affiliations:
@@ -48,23 +48,23 @@ curvature encodes information about dark matter halo properties (flattening and
 orientation), baryonic components (disk parameters and galactic center
 position), and mass distribution. `Potamides` implements the
 curvature–gravitational-acceleration alignment likelihood framework introduced
-by @Nibauer:2023, coupling JAX-accelerated spline representations of stream
-tracks with fast evaluations of gravitational accelerations from flexible halo
-and disk potentials. This enables an end-to-end workflow: building smooth stream
-tracks from observed positions; computing tangents, principal normals, and
-scalar curvature; evaluating gravitational accelerations under candidate
+by @Nibauer:2023, coupling JAX [@jax]-accelerated spline representations of
+stream tracks with fast evaluations of gravitational accelerations from flexible
+halo and disk potentials. This enables an end-to-end workflow: building smooth
+stream tracks from observed positions; computing tangents, principal normals,
+and scalar curvature; evaluating gravitational accelerations under candidate
 potentials; and combining segment-wise likelihoods across multiple streams with
 density-based weighting.
 
-The package integrates with `unxt` for JAX-compatible units [@unxt] and the
-`galax` library [@galax] for potential evaluations. JAX JIT-compilation and
-vectorization enable rapid likelihood evaluation across large parameter spaces—a
-critical capability for Bayesian inference and parameter exploration with modern
-samplers. By focusing on stream curvature rather than orbit integration,
-`Potamides` provides a complementary approach to traditional galactic dynamics
-tools. The package includes comprehensive tests, documented examples, and is
-distributed under the MIT license, making high-performance curvature-based
-inference readily accessible to the astronomical community.
+The package integrates with `unxt` [@unxt] for JAX-compatible units and the
+`galax` library [@galax] for potential evaluations. JAX's just-in-time (JIT)
+compilation and vectorization enable rapid likelihood evaluation across large
+parameter spaces—a critical capability for Bayesian inference and parameter
+exploration with modern samplers. By focusing on stream curvature rather than
+orbit integration, `Potamides` provides a complementary approach to traditional
+galactic dynamics tools. The package includes comprehensive tests, documented
+examples, and is distributed under the MIT license, making high-performance
+curvature-based inference readily accessible to the astronomical community.
 
 # Statement of need
 
@@ -72,24 +72,24 @@ Constraining the shape and structure of dark matter halos is essential for
 understanding galaxy formation and testing cosmological models. Stellar
 streams—tidal debris from disrupted satellites (dwarf galaxies or globular
 clusters)—provide powerful tracers of the galactic gravitational potential
-because their morphology encodes the host halo's properties [@Koposov:2010;
-@Bonaca:2014]. The curvature-based inference method introduced by @Nibauer:2023
-offers a novel approach: it compares the local curvature of observed streams
-with predicted gravitational accelerations, enabling robust constraints on halo
-flattening and orientation. However, until now, this methodology lacked a
-well-documented, accessible, and high-performance software implementation.
+because their morphology encodes the host halo's properties [@Bonaca:2014]. The
+curvature-based inference method [@Nibauer:2023] offers a novel approach: it
+compares the local curvature of observed streams with predicted gravitational
+accelerations, enabling robust constraints on halo flattening and orientation.
+However, until now, this methodology lacked a well-documented, accessible, and
+high-performance software implementation.
 
 `Potamides` fills this gap by providing the first open-source, production-ready
-implementation of the @Nibauer:2023 framework. The package addresses three
-critical needs in modern extragalactic dynamics research:
+implementation of the curvature-based inference framework. The package addresses
+three critical needs in modern extragalactic dynamics research:
 
-**1. Accessible implementation of a novel method.** While the original
-@Nibauer:2023 work demonstrated the power of curvature-based inference, it did
-not provide a standardized software package for community adoption. `Potamides`
-makes this methodology readily available to researchers, lowering the barrier to
-entry and enabling reproducible science. The well-documented API and examples
-allow users to apply curvature-based constraints without reimplementing the
-complex likelihood framework.
+**1. Accessible implementation of a novel method.** While the original work
+demonstrated the power of curvature-based inference, it did not provide a
+standardized software package for community adoption. `Potamides` makes this
+methodology readily available to researchers, lowering the barrier to entry and
+enabling reproducible science. The well-documented API and examples allow users
+to apply curvature-based constraints without reimplementing the complex
+likelihood framework.
 
 **2. Scalability for upcoming survey data.** Next-generation imaging surveys
 will discover hundreds to thousands of stellar streams in nearby galaxies
