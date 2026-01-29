@@ -666,7 +666,7 @@ class AbstractTrack:
         ax.plot(*self(gamma).T, c=c, ls=ls, lw=lw, label=label, zorder=l_zorder)
 
         # Add the knot points
-        ax.scatter(*self.knots.T, s=knot_size, c=c, label="knot", zorder=knot_zorder)
+        ax.scatter(*self.knots.T, s=knot_size, c=c, label=None, zorder=knot_zorder)
 
         return ax
 
@@ -1088,7 +1088,7 @@ class AbstractTrack:
                 ax=ax,
                 vec_width=vec_width,
                 vec_scale=vec_scale,
-                label=r"$\hat{K}$" if labels else None,
+                label=r"$\hat{\kappa}$" if labels else None,
                 **(curvature_kwargs or {}),
             )
 
