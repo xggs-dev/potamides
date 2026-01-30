@@ -91,16 +91,16 @@ test = [
 
 
 [build-system]
-  requires = [
-    "hatch-vcs",
-    "hatchling",
-  ]
-  build-backend = "hatchling.build"
+requires = ["hatch-vcs", "hatchling"]
+build-backend = "hatchling.build"
 
 
 [tool.hatch]
-  version.source               = "vcs"
-  build.hooks.vcs.version-file = "src/potamides/_version.py"
+version.source               = "vcs"
+build.hooks.vcs.version-file = "src/potamides/_version.py"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
 
 
 [tool.codespell]
