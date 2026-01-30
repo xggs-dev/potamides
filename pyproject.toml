@@ -9,8 +9,7 @@ description = "Constrain gravitational potential with stream curvature"
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
-  "Development Status :: 1 - Planning",
-  "Intended Audience :: Developers",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
@@ -23,9 +22,7 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Typing :: Typed",
 ]
-dynamic = [
-  "version",
-]
+dynamic = ["version"]
 dependencies = [
   "astropy>=7.0",
   "galax",
@@ -91,20 +88,25 @@ test = [
 
 
 [build-system]
-  requires = [
-    "hatch-vcs",
-    "hatchling",
-  ]
-  build-backend = "hatchling.build"
+requires = ["hatch-vcs", "hatchling"]
+build-backend = "hatchling.build"
 
 
 [tool.hatch]
-  version.source               = "vcs"
-  build.hooks.vcs.version-file = "src/potamides/_version.py"
+build.hooks.vcs.version-file = "src/potamides/_version.py"
+build.hooks.vcs.version-file-template = """\
+version: str = {version!r}
+version_tuple: tuple[int, int, int] | tuple[int, int, int, str, str]
+version_tuple = {version_tuple!r}
+"""
+version.source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
 
 
 [tool.codespell]
-skip = "uv.lock"
+skip = ["uv.lock", "paper/paper.bib"]
 ignore-words-list = "ptd"
 
 
@@ -113,20 +115,16 @@ name = "cz_gitmoji"
 
 
 [tool.coverage]
-  run.source = [
-    "potamides",
-  ]
-  report.exclude_also = [
-    '\.\.\.',
-    'if typing.TYPE_CHECKING:',
-  ]
+report.exclude_also = [
+  '\.\.\.',
+  'if TYPE_CHECKING:',
+]
+run.branch = true
+run.source = ["potamides"]
 
 
 [tool.mypy]
-  files = [
-    "src",
-    "tests",
-  ]
+  files = ["src"]
   python_version = "3.11"
   warn_unused_configs = true
   strict = true
