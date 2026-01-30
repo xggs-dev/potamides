@@ -12,47 +12,78 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
-  # Many color libraries just need this to be set to any value, but at least
-  # one distinguishes color depth, where "3" -> "256-bit color".
   FORCE_COLOR: 3
 
 jobs:
-  dist:
-    name: Distribution build
+  build:
+    name: Build & inspect package
     runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v5.5.0
-
-      - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
-
-  publish:
-    needs: [dist]
-    name: Publish to PyPI
-    environment: pypi
     permissions:
+      contents: read
       id-token: write
       attestations: write
-      contents: read
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v5.5.0
         with:
-          name: Packages
-          path: dist
+          # Required for hatch-vcs to determine version from git tags.
+          # Can be removed if switching to hardcoded versions.
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Generate artifact attestation for sdist and wheel
-        uses: actions/attest-build-provenance@00014ed6ed5efc5b1ab7f7f34a39eb55d41aa4f8 # v3.1.0
+      - uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
         with:
-          subject-path: "dist/*"
+          attest-build-provenance-github:
+            ${{ github.event_name != 'pull_request' }}
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/potamides
+    permissions:
+      id-token: write
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      (github.event_name == 'release' && github.event.action == 'published')
+
+    steps:
+      - name: Download built artifact to dist/
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: Packages-potamides
+          path: dist
 
       - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
-          # Remember to tell (test-)pypi about this repo before publishing
-          # Remove this line to publish to PyPI
           repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/potamides
+    permissions:
+      id-token: write
+    if: |
+      github.event_name == 'release' &&
+      github.event.action == 'published' &&
+      startsWith(github.event.release.tag_name, 'v')
+
+    steps:
+      - name: Download built artifact to dist/
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: Packages-potamides
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+
