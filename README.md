@@ -55,10 +55,6 @@ uv pip install -e .
 - For GPU support, install JAX with CUDA support separately
 - See `pyproject.toml` for full dependency list
 
-## Quick Start
-
-**TODO**
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
