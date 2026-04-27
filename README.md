@@ -75,6 +75,10 @@ This package builds upon excellent open-source scientific software:
 - **[unxt](https://github.com/GalacticDynamics/unxt)**: Unitful quantities for
   JAX
 
+## AI Usage Disclosure
+
+Portions of this codebase (including tests and documentation) were refactored and generated with the assistance of Language Models. All AI contributions have been and will continue to be reviewed and verified by the human maintainers.
+
 ---
 
 <!-- prettier-ignore-start -->
