@@ -1,0 +1,44 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "https://orcid.org/0009-0003-4675-3622",
+      "@type": "Person",
+      "email": "sirui.wu@nbi.ku.dk",
+      "name": "Sirui Wu",
+      "affiliation": "Niels Bohr Institute, University of Copenhagen, Denmark"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-3954-3291",
+      "@type": "Person",
+      "email": "starkman@mit.edu",
+      "name": "Nathaniel Starkman",
+      "affiliation": "Brinson Prize Fellow at Kavli Institute for Astrophysics and Space Research, Massachusetts Institute of Technology, USA"
+    },
+    {
+      "@id": "https://orcid.org/0000-0001-8042-5794",
+      "@type": "Person",
+      "email": "jnibauer@princeton.edu",
+      "name": "Jacob Nibauer",
+      "affiliation": "Department of Physics, Princeton University, USA"
+    },
+    {
+      "@id": "https://orcid.org/0000-0003-0256-5446",
+      "@type": "Person",
+      "email": "sarah.pearson@nbi.ku.dk",
+      "name": "Sarah Pearson",
+      "affiliation": "Niels Bohr Institute, University of Copenhagen, Denmark"
+    }
+  ],
+  "identifier": "https://doi.org/10.5281/zenodo.17808542",
+  "codeRepository": "https://github.com/xggs-dev/potamides",
+  "datePublished": "2026-04-27",
+  "dateModified": "2026-04-27",
+  "dateCreated": "2026-04-27",
+  "description": "Constrain gravitational potential with stream curvature",
+  "keywords": "Python, astronomy, stellar stream",
+  "license": "MIT",
+  "title": "Potamides: A Python package for stream curvature analysis",
+  "version": "v0.1.0"
+}
