@@ -5,6 +5,9 @@ on:
       - paper/**
       - .github/workflows/draft-pdf.yml
 
+permissions:
+  contents: read
+
 jobs:
   paper:
     runs-on: ubuntu-latest
