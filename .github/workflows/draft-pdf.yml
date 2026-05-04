@@ -5,8 +5,14 @@ on:
       - paper/**
       - .github/workflows/draft-pdf.yml
 
+permissions:
+  contents: read
+
 jobs:
   paper:
+    permissions:
+      contents: read
+      actions: write
     runs-on: ubuntu-latest
     name: Paper Draft
     steps:
