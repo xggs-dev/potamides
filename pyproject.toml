@@ -252,5 +252,10 @@ norecursedirs = ["docs/_build"]
       "potamides.splinelib" = "splib"
 
 
+[tool.uv]
+  constraint-dependencies = [
+    "quax>=0.3.5",
+  ]
+
 [tool.uv.sources]
   galax = { git = "https://github.com/GalacticDynamics/galax.git", rev = "main" }
