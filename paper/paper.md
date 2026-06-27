@@ -62,14 +62,14 @@ across many potential models.
 Stellar streams are popular tracers of galactic gravitational potentials and the
 dark matter halos that dominate galaxies [@Bonaca:2014]. For external galaxies,
 the observed dynamical information is often limited to projected stream
-morphology. The curvature-based method of [@Nibauer:2023] addresses this regime
-by using the local relationship between stream curvature and gravitational
-acceleration to directly constrain the potential's geometry from the projected
-stream track.
+morphology. The curvature-based method of Nibauer et al. (2023) [@Nibauer:2023]
+addresses this regime by using the local relationship between stream curvature
+and gravitational acceleration to directly constrain the potential's geometry
+from the projected stream track.
 
 Until now, this method lacked a reusable, high-performance software
-implementation intended for community use. `Potamides` fills that gap by serving
-as the active platform for curvature-based inference. It builds on the original
+implementation intended for community use. `Potamides` fills that gap, serving
+as the code base for curvature-based inference. It builds on the original
 reference implementation while introducing methodological improvements such as
 spline-knot optimization, better handling of locally straight segments, and
 joint inference across multiple streams within a common likelihood.
