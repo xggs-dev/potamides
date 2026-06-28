@@ -62,7 +62,7 @@ across many potential models.
 Stellar streams are popular tracers of galactic gravitational potentials and the
 dark matter halos that dominate galaxies [@Bonaca:2014]. For external galaxies,
 the observed dynamical information is often limited to projected stream
-morphology. The curvature-based method of Nibauer et al. (2023) [@Nibauer:2023]
+morphology. The curvature-based method of Nibauer et al. [@Nibauer:2023]
 addresses this regime by using the local relationship between stream curvature
 and gravitational acceleration to directly constrain the potential's geometry
 from the projected stream track.
