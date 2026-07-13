@@ -1,7 +1,7 @@
 # Contributing to potamides
 
 Thank you for your interest in contributing! potamides is made for its users, so
-contributions of all kinds are welcome and encouraged --- whether you are a
+contributions of all kinds are welcome and encouraged — whether you are a
 seasoned developer or have never contributed to an open-source project before.
 You do not need to write code to help: reporting a bug, suggesting a feature,
 improving the documentation, or sharing a scientific use case are all valuable.
