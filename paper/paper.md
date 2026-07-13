@@ -126,15 +126,16 @@ entire galaxy.
 
 Performance is highly optimized. Starting from an annotated stream, `Potamides`
 infers a ridge-line spline via gradient-based optimization in 10–30 seconds on a
-2023 M2 MacBook Pro. Posterior refinement with NUTS [@Hoffman:2014] typically
-requires another 20 seconds. The potential-inference stage evaluates the
-curvature likelihood on a dense grid of $10^6$ parameter points—marginalizing
-over roughly 50 spline realizations—in about 15 seconds per stream segment. For
-a galaxy with three segments, an end-to-end analysis runs in under 15 minutes on
-standard laptop hardware. On a single GPU, the combined spline-posterior and
-potential-evaluation stages execute in roughly one minute. This speed supports
-the rapid evaluation of many potential families, making it easier to test model
-dependencies without committing early to a single dynamical description.
+2023 M2 MacBook Pro. Posterior refinement with NUTS [@Hoffman+Gelman:2011]
+typically requires another 20 seconds. The potential-inference stage evaluates
+the curvature likelihood on a dense grid of $10^6$ parameter
+points—marginalizing over roughly 50 spline realizations—in about 15 seconds per
+stream segment. For a galaxy with three segments, an end-to-end analysis runs in
+under 15 minutes on standard laptop hardware. On a single GPU, the combined
+spline-posterior and potential-evaluation stages execute in roughly one minute.
+This speed supports the rapid evaluation of many potential families, making it
+easier to test model dependencies without committing early to a single dynamical
+description.
 
 # Research impact statement
 
