@@ -50,7 +50,7 @@ uv pip install -e .
 
 ### Requirements
 
-- Python >= 3.11
+- Python >= 3.12
 - JAX >= 0.5.3
 - For GPU support, install JAX with CUDA support separately
 - See `pyproject.toml` for full dependency list

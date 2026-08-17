@@ -7,7 +7,7 @@ authors = [
 ]
 description = "Constrain gravitational potential with stream curvature"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
@@ -15,7 +15,6 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python",
@@ -25,7 +24,7 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
   "astropy>=7.0",
-  "galax",
+  "galax>=0.0.3",
   "interpax>=0.3.8",
   "jax>=0.5.3",
   "jaxtyping>=0.3.1",
@@ -125,7 +124,7 @@ run.source = ["potamides"]
 
 [tool.mypy]
   files = ["src"]
-  python_version = "3.11"
+  python_version = "3.12"
   warn_unused_configs = true
   strict = true
   enable_error_code = [
@@ -163,7 +162,7 @@ run.source = ["potamides"]
 
 
 [tool.pylint]
-  py-version = "3.11"
+  py-version = "3.12"
   ignore-paths = [
     ".*/_version.py",
   ]
@@ -250,12 +249,3 @@ norecursedirs = ["docs/_build"]
     [tool.ruff.lint.flake8-import-conventions.aliases]
       potamides = "ptd"
       "potamides.splinelib" = "splib"
-
-
-[tool.uv]
-  constraint-dependencies = [
-    "quax>=0.3.5",
-  ]
-
-[tool.uv.sources]
-  galax = { git = "https://github.com/GalacticDynamics/galax.git", rev = "main" }
