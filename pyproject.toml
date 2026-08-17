@@ -239,6 +239,8 @@ norecursedirs = ["docs/_build"]
       "PLR2004", # Magic value used in comparison
       "RET504",  # Unnecessary assignment before `return` statement
       "RUF003",  # doesn't like chinese commas
+      "UP040",   # PEP 695 `type` alias. reason: jaxtyping aliases are kept as
+                 # `TypeAlias`; the pinned mypy cannot parse `type` statements.
     ]
 
     [tool.ruff.lint.per-file-ignores]
