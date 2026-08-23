@@ -20,7 +20,7 @@ env:
   FORCE_COLOR: 3
 
 jobs:
-  pre-commit:
+  prek:
     name: Format
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
   checks:
     name: Check Python ${{ matrix.python-version }} on ${{ matrix.runs-on }}
     runs-on: ${{ matrix.runs-on }}
-    needs: [pre-commit]
+    needs: [prek]
     strategy:
       fail-fast: false
       matrix:

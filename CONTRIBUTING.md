@@ -56,11 +56,11 @@ management and [`nox`](https://nox.thea.codes/) to run common tasks.
    This installs potamides in editable mode along with the `dev` dependency
    group (tests, linters, docs, and nox).
 
-3. **Install the pre-commit hooks** so formatting and linting run automatically
+3. **Install the prek hooks** so formatting and linting run automatically
    on each commit:
 
    ```bash
-   uv run pre-commit install
+   uv run prek install
    ```
 
 ## Making changes
@@ -100,7 +100,7 @@ you:
 # Run the test suite
 uv run nox -s pytest
 
-# Run linters and type checks (pre-commit + pylint)
+# Run linters and type checks (prek + pylint)
 uv run nox -s lint
 
 # Build the documentation
@@ -117,7 +117,7 @@ If you prefer to run the tools directly within the synced environment:
 
 ```bash
 uv run pytest
-uv run pre-commit run --all-files
+uv run prek run --all-files
 ```
 
 ### A note on test data
