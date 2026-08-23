@@ -50,8 +50,8 @@ stream can constrain the underlying potential.
 The package implements and extends the curvature-based likelihood framework of
 [@Nibauer:2023]. Rather than generating a full dynamical realization of a
 stellar stream for each trial model, `Potamides` represents observed stream
-tracks with JAX-based splines. It evaluates gravitational accelerations in
-candidate potentials and compares them directly to the local stream geometry.
+tracks with JAX-based splines [@jax]. It evaluates gravitational accelerations
+in candidate potentials and compares them directly to the local stream geometry.
 This provides a lower-cost inference workflow that complements traditional
 forward-modeling approaches. `Potamides` supports the complete analysis pipeline
 for a galaxy, from annotating stream ridge-lines to evaluating likelihoods
@@ -141,9 +141,9 @@ description.
 
 `Potamides` is actively used in current research workflows. Specifically, it is
 being used in a Euclid Key Paper analysis of stellar streams in the Q1 data
-release and in a separate study of streams in the Stream Legacy Survey. Both
-projects rely on the package as the primary implementation for curvature-based
-inference.
+release [@Starkman:2026:EuclidQ1] and in a separate study of streams in the
+Stream Legacy Survey [@Wu:2026:Potamides]. Both projects rely on the package as
+the primary implementation for curvature-based inference.
 
 The software demonstrates immediate scientific value by providing tested,
 high-performance, reproducible capabilities. Notably, `Potamides` successfully
