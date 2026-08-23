@@ -51,7 +51,7 @@ You should prepare prek, which will help you by checking that commits pass
 required checks:
 
 ```bash
-pip install prek # or brew install prek on macOS
+pipx install prek
 prek install # Will install a prek hook into the git repo
 ```
 

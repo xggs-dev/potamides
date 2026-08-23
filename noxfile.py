@@ -19,12 +19,12 @@ DIR = Path(__file__).parent.resolve()
 @session(uv_groups=["lint"], reuse_venv=True)
 def lint(s: nox.Session, /) -> None:
     """Run the linter."""
-    precommit(s)  # reuse prek session
+    prek_session(s)  # reuse prek session
     pylint(s)  # reuse pylint session
 
 
 @session(uv_groups=["lint"], reuse_venv=True)
-def precommit(s: nox.Session, /) -> None:
+def prek_session(s: nox.Session, /) -> None:
     """Run prek."""
     s.run("prek", "run", "--all-files", *s.posargs)
 
