@@ -45,7 +45,7 @@ py -m venv .venv
 py -m install -v -e .[dev]
 ```
 
-# Prek
+# Pre-commit
 
 You should prepare prek, which will help you by checking that commits pass
 required checks:
