@@ -56,7 +56,7 @@ management and [`nox`](https://nox.thea.codes/) to run common tasks.
    This installs potamides in editable mode along with the `dev` dependency
    group (tests, linters, docs, and nox).
 
-3. **Install the prek hooks** so formatting and linting run automatically on
+3. **Install the pre-commit hooks** so formatting and linting run automatically on
    each commit:
 
    ```bash
