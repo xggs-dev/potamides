@@ -57,11 +57,11 @@ information about the host's gravitational field, the local curvature of a
 stream can constrain the underlying gravitational potential.
 
 The package implements and extends the curvature-based likelihood framework of
-@Nibauer:2023. Rather than generating a full dynamical realization of a
-stellar stream for each trial model, `Potamides` represents observed stream
-tracks with JAX-based splines [@jax]. It evaluates gravitational accelerations
-in candidate potentials and compares them directly to the local stream geometry.
-This provides a lower-cost inference workflow that complements traditional
+@Nibauer:2023. Rather than generating a full dynamical realization of a stellar
+stream for each trial model, `Potamides` represents observed stream tracks with
+JAX-based splines [@jax]. It evaluates gravitational accelerations in candidate
+potentials and compares them directly to the local stream geometry. This
+provides a lower-cost inference workflow that complements traditional
 forward-modeling approaches. `Potamides` supports the complete analysis pipeline
 for a galaxy, from annotating stream ridge-lines to evaluating likelihoods
 across many potential models.
@@ -71,10 +71,10 @@ across many potential models.
 Stellar streams are popular tracers of galactic gravitational potentials and the
 dark matter halos that dominate galaxies [@Bonaca:2014]. For external galaxies,
 the observed dynamical information is often limited to projected stream
-morphology. The curvature-based method of @Nibauer:2023
-addresses this regime by using the local relationship between stream curvature
-and gravitational acceleration to directly constrain the potential's geometry
-from the projected stream track.
+morphology. The curvature-based method of @Nibauer:2023 addresses this regime by
+using the local relationship between stream curvature and gravitational
+acceleration to directly constrain the potential's geometry from the projected
+stream track.
 
 Until now, this method lacked a reusable, high-performance software
 implementation intended for community use. `Potamides` fills that gap, serving
