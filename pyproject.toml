@@ -106,7 +106,7 @@ local_scheme = "no-local-version"
 
 [tool.codespell]
 skip = ["uv.lock", "paper/paper.bib"]
-ignore-words-list = "ptd"
+ignore-words-list = "aas,ptd"
 
 
 [tool.commitizen]

@@ -36,23 +36,32 @@ affiliations:
     ror: 00hx57361
 date: 7 Dec 2025
 bibliography: paper.bib
+
+# Optional fields for papers that are part of a joint submission.
+# For example, submitting to a AAS journal too, see this blog post:
+# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
+#
+# If you are not making a joint submission you should remove these lines.
+#
+aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
+aas-journal: Astrophysical Journal
 ---
 
 # Summary
 
-`Potamides` is a Python package for inferring the mass distribution of galaxies
+`Potamides` is a Python package for inferring the mass distributions of galaxies
 from the projected shapes of stellar streams in imaging data. Stellar streams
 are elongated structures produced when star clusters or dwarf galaxies are
 tidally disrupted by their host. Because their projected tracks carry
 information about the host's gravitational field, the local curvature of a
-stream can constrain the underlying potential.
+stream can constrain the underlying gravitational potential.
 
 The package implements and extends the curvature-based likelihood framework of
-[@Nibauer:2023]. Rather than generating a full dynamical realization of a
-stellar stream for each trial model, `Potamides` represents observed stream
-tracks with JAX-based splines [@jax]. It evaluates gravitational accelerations
-in candidate potentials and compares them directly to the local stream geometry.
-This provides a lower-cost inference workflow that complements traditional
+@Nibauer:2023. Rather than generating a full dynamical realization of a stellar
+stream for each trial model, `Potamides` represents observed stream tracks with
+JAX-based splines [@jax]. It evaluates gravitational accelerations in candidate
+potentials and compares them directly to the local stream geometry. This
+provides a lower-cost inference workflow that complements traditional
 forward-modeling approaches. `Potamides` supports the complete analysis pipeline
 for a galaxy, from annotating stream ridge-lines to evaluating likelihoods
 across many potential models.
@@ -62,10 +71,10 @@ across many potential models.
 Stellar streams are popular tracers of galactic gravitational potentials and the
 dark matter halos that dominate galaxies [@Bonaca:2014]. For external galaxies,
 the observed dynamical information is often limited to projected stream
-morphology. The curvature-based method of Nibauer et al. [@Nibauer:2023]
-addresses this regime by using the local relationship between stream curvature
-and gravitational acceleration to directly constrain the potential's geometry
-from the projected stream track.
+morphology. The curvature-based method of @Nibauer:2023 addresses this regime by
+using the local relationship between stream curvature and gravitational
+acceleration to directly constrain the potential's geometry from the projected
+stream track.
 
 Until now, this method lacked a reusable, high-performance software
 implementation intended for community use. `Potamides` fills that gap, serving
@@ -147,7 +156,7 @@ the primary implementation for curvature-based inference.
 
 The software demonstrates immediate scientific value by providing tested,
 high-performance, reproducible capabilities. Notably, `Potamides` successfully
-reproduces the foundational research results of [@Nibauer:2023]. By streamlining
+reproduces the foundational research results of @Nibauer:2023. By streamlining
 the process from annotating stream segments to calculating potential likelihoods
 on standard hardware, `Potamides` serves as a highly practical tool for
 researchers exploring gravitational potentials through stream morphology.
