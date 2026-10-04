@@ -55,6 +55,8 @@ exclude_patterns: Final[list[str]] = [
 ]
 
 html_theme: Final[str] = "sphinx_book_theme"
+html_logo: Final[str] = "static/favicon.svg"  # made by static/make_logo.py
+html_favicon: Final[str] = "static/favicon.svg"
 
 html_theme_options: dict[str, Any] = {
     "home_page_in_toc": True,
