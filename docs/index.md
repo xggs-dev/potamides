@@ -11,6 +11,8 @@ kernelspec:
 
 # potamides
 
+[![JOSS](https://joss.theoj.org/papers/10.21105/joss.10712/status.svg)](https://doi.org/10.21105/joss.10712)
+
 ```{toctree}
 :maxdepth: 2
 :hidden:
