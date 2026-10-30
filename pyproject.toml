@@ -67,7 +67,7 @@ docs = [
 ]
 lint = [
   "prek>=0.4.0",
-  "pylint==4.0.4",
+  "pylint==4.0.9",
 ]
 nox = [
   "nox-uv>=0.6.3",
